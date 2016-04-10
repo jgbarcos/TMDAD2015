@@ -39,4 +39,3 @@ Some guidelines to mantain a coherent style between every member:
 > - PROLOGUE
 >
 > Tokenizer's parser was fixed to recognize those styles and remove trailing whitespaces.
-

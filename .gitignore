@@ -1,3 +1,13 @@
 /RemoteSystemsTempFiles/
 /.metadata/
 /.recommenders/
+.DS_Store
+.gradle/
+.metadata/
+.project
+.recommenders/
+.settings/
+gradle/
+gradlew
+gradlew.bat
+settings.gradle
