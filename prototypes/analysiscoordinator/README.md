@@ -10,5 +10,4 @@ Once it has the book and the terms, the coordinator forwards them to the Tokeniz
 
 The coordinator gets the result from the Tokenizer and returns it to the GUI.
 
-## tokenizer operations
-//TODO
+## Analysis operations
