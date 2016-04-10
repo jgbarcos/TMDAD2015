@@ -1,4 +1,6 @@
-
+/RemoteSystemsTempFiles/
+/.metadata/
+/.recommenders/
 .DS_Store
 .gradle/
 .metadata/
