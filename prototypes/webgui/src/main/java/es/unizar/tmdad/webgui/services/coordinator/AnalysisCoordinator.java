@@ -83,16 +83,12 @@ public class AnalysisCoordinator {
 	}
 	
 	private BookRaw callGateway(int book){
-		/*
-		// TODO: Integration with Gateway not tested yet
-	    String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?id="+book;		
+		
+	    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
 		
 		RestTemplate restTemplate = new RestTemplate();
-		return restTemplate.getForObject(url, BookRaw.class);*/
+		return restTemplate.getForObject(url, BookRaw.class);
 		
-		//Use this as a way to avoid wasting transactions to gutenberg site
-		String filepath = "src/main/resources/Alice\'s Adventures in Wonderland";
-		return new BookRaw(book, readFile(filepath));
 	}
 	
 	private BookTokenized callTokenizer (BookRaw bookRaw, List<String> tokens){
