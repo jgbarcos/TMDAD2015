@@ -1,4 +1,4 @@
-package es.unizar.tmdad.service;
+package es.unizar.tmdad.webgui.interfacing;
 
 public class BookRaw {
 	private int id;

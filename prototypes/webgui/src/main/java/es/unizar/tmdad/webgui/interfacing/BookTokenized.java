@@ -1,4 +1,4 @@
-package es.unizar.tmdad.service;
+package es.unizar.tmdad.webgui.interfacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,18 +7,9 @@ public class BookTokenized {
 	private int id;
 	private String title;
 	private List<Chapter> chapters;
-
+	
 	public BookTokenized() {
 		this.chapters = new ArrayList<Chapter>();
-	}
-	
-	public BookTokenized(int id) {
-		this.id = id;
-		this.chapters = new ArrayList<Chapter>();
-	}
-	
-	public void addChapter(Chapter chapter){
-		chapters.add(chapter);
 	}
 	
 	public int getId() {

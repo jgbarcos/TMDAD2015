@@ -1,24 +1,26 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.webgui.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookResult {
-	private String book;
+	private long id;
+	private String title;
 	private List<ChapterResult> chapters;
 	private List<ThemeResult> themes;
 	
-	public BookResult(String book){
-		this.book = book;
+	public BookResult(long id, String title){
+		this.id = id;
+		this.title = title;
 		this.chapters = new ArrayList<ChapterResult>();
 		this.themes = new ArrayList<ThemeResult>();
 	}
 	
-	public void addToken(String themeName, String chapterName, String tokenName, long count){
-		ChapterResult chapter = chapters.stream().filter(c -> c.getTitle().equals(chapterName))
+	public void addToken(String themeName, int chapterId, String chapterName, String tokenName, long count){
+		ChapterResult chapter = chapters.stream().filter(c -> c.getId() == chapterId)
 									  		.findFirst().orElse(null);
 		if(chapter == null){
-			chapter = new ChapterResult(chapterName);
+			chapter = new ChapterResult(chapterId, chapterName);
 			chapters.add(chapter);
 		}
 		
@@ -34,9 +36,13 @@ public class BookResult {
 		theme.addToken(tokenName, count);
 		ThemeResult.calculatePercentage(themes);
 	}
+	
+	public long getId(){
+		return id;
+	}
 
-	public String getBook() {
-		return book;
+	public String getTitle() {
+		return title;
 	}
 	
 	public List<ThemeResult> getThemes() {

@@ -1,4 +1,4 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.webgui.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class ThemeResult {
 			totalcount += t.getTotalcount();
 		}
 		for(ThemeResult t : themes){
-			t.setPercentage((float)t.getTotalcount() / totalcount);
+			t.setPercentage(100.0f*(float)t.getTotalcount() / totalcount);
 		}
 	}
 	

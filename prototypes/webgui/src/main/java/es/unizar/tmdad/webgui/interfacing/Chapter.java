@@ -1,4 +1,4 @@
-package es.unizar.tmdad.service;
+package es.unizar.tmdad.webgui.interfacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +24,8 @@ public class Chapter {
 		this.tokens = tokens;		
 	}
 	
-	
-	//TODO Useless...
-	public void addToken(String word, int count){
+	public void createToken(String word, int count){
 		tokens.add(new Token(word, count));
-	}
-
-	public void addToken(Token token) {
-		tokens.add(token);
 	}
 
 	public int getId() {
@@ -57,5 +51,6 @@ public class Chapter {
 	public void setTokens(List<Token> tokens) {
 		this.tokens = tokens;
 	}
-
+	
+	
 }

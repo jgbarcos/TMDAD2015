@@ -27,7 +27,7 @@
 	<script id="resultTpl" type="text/template">
 		<div class="row panel panel-default">
     		<div class="panel-heading">
-				{{book}} Analysis
+				Analysis of: {{title}} ({{id}})
     		</div>
     		<div class="panel-body" >
 				{{#themes}}
@@ -44,7 +44,7 @@
 		{{#chapters}}
 		<div class="row panel panel-default">
     		<div class="panel-heading">
-				{{title}}
+				Chapter {{id}}: {{title}}
     		</div>
     		<div class="panel-body" >
 				{{#themes}}
