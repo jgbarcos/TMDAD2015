@@ -41,10 +41,10 @@ public class Tokenizer {
 		//I've call this function tokenize but firtstly it fill create a structure of chapters
 		//and then it will count tokens on each chapter.
 
-//		BufferedReader br = new BufferedReader(new StringReader(bookContent));
+		BufferedReader br = new BufferedReader(new StringReader(bookContent));
 		//Just to test
-		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Metamorphosis"); 
-		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+//		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Metamorphosis"); 
+//		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		//
 		String line;
 		StringBuilder sb = null;
