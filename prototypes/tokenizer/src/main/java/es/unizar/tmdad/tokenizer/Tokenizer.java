@@ -5,10 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 import es.unizar.tmdad.service.BookTokenized;
 import es.unizar.tmdad.service.Chapter;
@@ -21,8 +24,10 @@ public class Tokenizer {
 	
 	private Map<String, String> chapterMap;
 	
-	private static final String chapterDelimiter = "CHAPTER";
+	private static final String chapterDelimiter = "^CHAPTER";
+	private static final Pattern chapterPattern = Pattern.compile(chapterDelimiter);
 	private static final String titleDelimiter = "Title";	
+	private static final Pattern titlePattern = Pattern.compile(titleDelimiter);
 	
 	public Tokenizer(String bookContent, List<String> terms, BookTokenized bookTok) {
 		super();
@@ -35,26 +40,32 @@ public class Tokenizer {
 	public BookTokenized tokenize() throws IOException{
 		//I've call this function tokenize but firtstly it fill create a structure of chapters
 		//and then it will count tokens on each chapter.
-		System.out.println("TOKENIZE HAS BEEN CALLED!!! " + this.bookContent);
-//		BufferedReader br = new BufferedReader(new StringReader(bookContent));
+
+		BufferedReader br = new BufferedReader(new StringReader(bookContent));
 		//Just to test
-		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Alice's Adventures in Wonderland");
-		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+//		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Moby Dick"); 
+//		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		//
 		String line;
 		StringBuilder sb = null;
 		String chapterTitle = "";
 		//Process line by line
 	    while ((line = br.readLine()) != null) {
-	    	if(line.contains(titleDelimiter)){
-	    		bookTok.setTitle("Alice's Adventures in Wonderland"); //TODO
-	    	} else if (line.contains(chapterDelimiter)){
+	    	if(titlePattern.matcher(line).find()){
+//	    	if(line.contains(titleDelimiter)){
+	    		bookTok.setTitle(line.split(":")[1].substring(1)); 
+//	    	} else if (line.contains(chapterDelimiter)){
+	    	} else if (chapterPattern.matcher(line).find()) {
 	    		if(sb != null){
 	    			// We have detected a new chapter, so we have save previous results
 	    			chapterMap.put(chapterTitle, sb.toString());
 	    		}
 	    		sb = new StringBuilder();
-	    		chapterTitle = line.split(".")[1];
+	    		if(line.split("\\.")[1] != null){
+	    			chapterTitle = line.split("\\.")[1].substring(1);
+	    		} else {
+	    			chapterTitle = line;
+	    		}
 	    	} else if (sb != null) {
 	    		sb.append(line);
 	    	}
@@ -63,29 +74,23 @@ public class Tokenizer {
 	    
 	    //Just to test
 	    int i = 0;
-	    for (String key : chapterMap.keySet()) {
-	        String value = chapterMap.get(key);
-	        bookTok.addChapter(new Chapter(i, value));
+	    for (Map.Entry<String, String> entry : chapterMap.entrySet()) {
+	        String cTitle = entry.getKey();
+	        String cContent = entry.getValue();
+	        Chapter chapter = new Chapter(i, cTitle);
+	        bookTok.addChapter(chapter);
+	        countChapterTokens(chapter, cContent, terms);
 	        i++;
-	        System.out.println("Key = " + key + ", Value = " + value);
-	    }
-	    //
-//		bookTok.addChapter(new Chapter(1, "Down the Rabbit-Hole"));
-//		bookTok.addChapter(new Chapter(2, "The Pool of Tears"));
-		
-		bookTok.getChapters().get(0).addToken(new Token("rabbit", 7));
-		bookTok.getChapters().get(0).addToken(new Token("cat", 2));
-		bookTok.getChapters().get(0).addToken(new Token("cry", 3));
-		bookTok.getChapters().get(1).addToken(new Token("rabbit", 1));
-		bookTok.getChapters().get(1).addToken(new Token("bat", 2));
-		
+	    } //TODO Migrate to Java 8 streams interface
+
 		return bookTok;
 	}
 
-	private void countChapterTokens(Chapter chapter, List<String> terms) {
-		// //TODO From terms(list) to token(arrayList)
-		chapter.addToken(new Token("rabbit", 7));
-		chapter.addToken(new Token("cat", 2));
+	private void countChapterTokens(Chapter chapter, String cContent, List<String> terms) {
+		for (String term: terms){
+			int occurance = StringUtils.countMatches(cContent, term);
+			chapter.addToken(new Token(term, occurance));
+		}
 	}
 	
 }
