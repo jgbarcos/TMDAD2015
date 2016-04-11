@@ -24,7 +24,7 @@ public class Tokenizer {
 	
 	private Map<String, String> chapterMap;
 	
-	private static final String chapterDelimiter = "^CHAPTER|^Chapter|^[IVXLCM]*$";
+	private static final String chapterDelimiter = "^CHAPTER"; //|^[IVXLCM]*$
 	private static final Pattern chapterPattern = Pattern.compile(chapterDelimiter);
 	private static final String titleDelimiter = "Title";	
 	private static final Pattern titlePattern = Pattern.compile(titleDelimiter);
@@ -40,10 +40,9 @@ public class Tokenizer {
 	public BookTokenized tokenize() throws IOException{
 		//I've call this function tokenize but firtstly it fill create a structure of chapters
 		//and then it will count tokens on each chapter.
-
 		BufferedReader br = new BufferedReader(new StringReader(bookContent));
 		//Just to test
-//		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Metamorphosis"); 
+//		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Alice's Adventures in Wonderland"); 
 //		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		//
 		String line;
