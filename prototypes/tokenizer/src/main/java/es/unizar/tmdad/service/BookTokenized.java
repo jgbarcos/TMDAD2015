@@ -8,10 +8,13 @@ public class BookTokenized {
 	private String title;
 	private List<Chapter> chapters;
 	
-	public BookTokenized() {
-		//TODO
+	public BookTokenized(int id) {
+		this.id = id;
 		this.chapters = new ArrayList<Chapter>();
-		chapters.add(new Chapter(1, "Down the Rabbit-Hole", new ArrayList<Theme>()));
+	}
+	
+	public void addChapter(Chapter chapter){
+		chapters.add(chapter);
 	}
 	
 	public int getId() {

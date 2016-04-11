@@ -6,14 +6,15 @@ import java.util.List;
 public class Chapter {
 	private int id;
 	private String title;
-	private List<Theme> themes;
+	private List<Token> tokens;
 	
-	public Chapter(int id, String title, List<Theme> themes) {
+	public Chapter(int id, String title) {
 		this.id = id;
 		this.title = title;
-		this.themes = themes;
-		themes.add(new Theme(1, "Animals", new ArrayList<Token>()));
-		
+	}
+	
+	public void addToken(Token token){
+		tokens.add(token);
 	}
 
 	public int getId() {
@@ -32,11 +33,12 @@ public class Chapter {
 		this.title = title;
 	}
 
-	public List<Theme> getThemes() {
-		return themes;
+	public List<Token> getTokens() {
+		return tokens;
 	}
 
-	public void setThemes(List<Theme> themes) {
-		this.themes = themes;
+	public void setTokens(List<Token> tokens) {
+		this.tokens = tokens;
 	}
+
 }

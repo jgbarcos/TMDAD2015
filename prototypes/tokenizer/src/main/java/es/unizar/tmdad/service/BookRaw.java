@@ -4,9 +4,8 @@ public class BookRaw {
 	private int id;
 	private String content;
 	
-	public BookRaw() {
-		//TODO
-	}
+//	public BookRaw() {
+//	}
 	
 	public int getId() {
 		return id;
