@@ -64,7 +64,7 @@ public class SerarchService {
 			br = new BufferedReader(new FileReader(getPathBook(bookId)));
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				book+=line;
+				book+=line+"\n";
 			}
 			
 			PieceOfBook  pieceOfBook = new PieceOfBook(bookId, book, 1, 1);
