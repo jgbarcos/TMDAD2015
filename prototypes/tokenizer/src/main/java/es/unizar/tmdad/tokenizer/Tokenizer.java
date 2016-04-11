@@ -24,7 +24,7 @@ public class Tokenizer {
 	
 	private Map<String, String> chapterMap;
 	
-	private static final String chapterDelimiter = "^CHAPTER";
+	private static final String chapterDelimiter = "^CHAPTER|^[IVXLCM]*$";
 	private static final Pattern chapterPattern = Pattern.compile(chapterDelimiter);
 	private static final String titleDelimiter = "Title";	
 	private static final Pattern titlePattern = Pattern.compile(titleDelimiter);
@@ -41,10 +41,10 @@ public class Tokenizer {
 		//I've call this function tokenize but firtstly it fill create a structure of chapters
 		//and then it will count tokens on each chapter.
 
-		BufferedReader br = new BufferedReader(new StringReader(bookContent));
+//		BufferedReader br = new BufferedReader(new StringReader(bookContent));
 		//Just to test
-//		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Moby Dick"); 
-//		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+		FileInputStream fstream = new FileInputStream("src\\main\\resources\\Metamorphosis"); 
+		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		//
 		String line;
 		StringBuilder sb = null;
@@ -61,7 +61,7 @@ public class Tokenizer {
 	    			chapterMap.put(chapterTitle, sb.toString());
 	    		}
 	    		sb = new StringBuilder();
-	    		if(line.split("\\.")[1] != null){
+	    		if(line.contains(".") && line.split("\\.")[1] != null){ //I'll changed it...
 	    			chapterTitle = line.split("\\.")[1].substring(1);
 	    		} else {
 	    			chapterTitle = line;
@@ -89,7 +89,9 @@ public class Tokenizer {
 	private void countChapterTokens(Chapter chapter, String cContent, List<String> terms) {
 		for (String term: terms){
 			int occurance = StringUtils.countMatches(cContent, term);
-			chapter.addToken(new Token(term, occurance));
+			if(occurance != 0){
+				chapter.addToken(new Token(term, occurance));
+			}
 		}
 	}
 	
