@@ -1,8 +1,12 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.webgui.interfacing;
 
 public class Token {
 	private String word;
 	private int count;
+	
+	public Token(){
+		// Default ctor, required for jackson
+	}
 	
 	public Token(String word, int count) {
 		this.word = word;

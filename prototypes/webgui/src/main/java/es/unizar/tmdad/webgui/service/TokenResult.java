@@ -1,4 +1,4 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.webgui.service;
 
 public class TokenResult {
 	private String word;

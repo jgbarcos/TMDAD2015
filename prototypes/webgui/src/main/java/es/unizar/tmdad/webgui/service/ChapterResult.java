@@ -1,13 +1,15 @@
-package es.unizar.tmdad.lab0.service;
+package es.unizar.tmdad.webgui.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChapterResult {
+	private long id;
 	private String title;
 	private List<ThemeResult> themes;
 	
-	public ChapterResult(String title){
+	public ChapterResult(long id, String title){
+		this.id = id;
 		this.title = title;
 		this.themes = new ArrayList<ThemeResult>();
 	}
@@ -22,6 +24,10 @@ public class ChapterResult {
 		}
 		theme.addToken(tokenName, count);
 		ThemeResult.calculatePercentage(themes);
+	}
+	
+	public long getId(){
+		return id;
 	}
 
 	public String getTitle() {

@@ -1,4 +1,4 @@
-package es.unizar.tmdad.lab0;
+package es.unizar.tmdad.webgui;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
