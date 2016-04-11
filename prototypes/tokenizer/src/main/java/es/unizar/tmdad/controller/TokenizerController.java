@@ -1,5 +1,7 @@
 package es.unizar.tmdad.controller;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.List;
 import java.util.Random;
 
@@ -11,29 +13,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.unizar.tmdad.service.BookRaw;
 import es.unizar.tmdad.service.BookTokenized;
+
+import es.unizar.tmdad.tokenizer.Tokenizer;
+import es.unizar.tmdad.tokenizer.TokenizerDummy;
+
 import es.unizar.tmdad.service.Chapter;
 
 @RestController
+@RequestMapping("/tokenize")
 public class TokenizerController {
 
-	@RequestMapping(value="/tokenize", method={RequestMethod.POST})
-	public BookTokenized tokenize(@RequestBody BookRaw bookRaw, @RequestParam("terms[]") List<String> terms){ //
+	@RequestMapping(method=RequestMethod.POST)
+	public BookTokenized tokenize(@RequestBody BookRaw bookRaw, @RequestParam("terms[]") List<String> terms){ 
 		
 		//TODO BookRaw -> BookTokenized
-		System.out.println("BOOK CONTENT: " + bookRaw.getContent().substring(0, 200) + "...");
+		System.out.println("BOOK CONTENT: " + bookRaw.getContent() + "...");
 		System.out.println(terms);
 		
-		// Fill with dummy data
-		BookTokenized bookTok = new BookTokenized();
-		bookTok.setId(bookRaw.getId());
-		bookTok.setTitle("Alice's Adventures in Wonderland");
+		BookTokenized bookTok = new BookTokenized(bookRaw.getId());
+		bookTok.setTitle("Alice's adventures in wonderland");
+		//TODO BookRaw -> BookTokenized
+//		try{
+			TokenizerDummy tokenizer = new TokenizerDummy(bookRaw.getContent(), terms, bookTok);
+			return tokenizer.tokenize();
+//		}catch(IOException ioex){
+//			//Do nothing...
+//			System.out.println(ioex);
+//		}
 		
-		createChapter(bookTok, terms, 1, "Down the Rabbit-Hole");
-		createChapter(bookTok, terms, 2, "The Pool of Tears");
-		createChapter(bookTok, terms, 3, "A Caucus-Race and a long Tale");
-		createChapter(bookTok, terms, 4, "The Rabbit sends in a little Bill");
-		
-		return bookTok;
+//		return bookTok;
 	}
 	
 	private void createChapter(BookTokenized bookTok, List<String> terms, int id, String chTitle){
@@ -43,7 +51,7 @@ public class TokenizerController {
 		Random rnd = new Random();
 		for(String t : terms){
 			if(rnd.nextFloat() < 0.6){
-				ch.createToken(t, rnd.nextInt(10)+1);
+				ch.addToken(t, rnd.nextInt(10)+1);
 			}
 		}
 		

@@ -24,8 +24,14 @@ public class Chapter {
 		this.tokens = tokens;		
 	}
 	
-	public void createToken(String word, int count){
+	
+	//TODO Useless...
+	public void addToken(String word, int count){
 		tokens.add(new Token(word, count));
+	}
+
+	public void addToken(Token token) {
+		tokens.add(token);
 	}
 
 	public int getId() {
@@ -51,6 +57,5 @@ public class Chapter {
 	public void setTokens(List<Token> tokens) {
 		this.tokens = tokens;
 	}
-	
-	
+
 }

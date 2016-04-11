@@ -5,8 +5,6 @@
       {
       	 "id": 1,
          "title":"Down the Rabbit-Hole",
-         "themes":[
-            {
                "id":1,
                "name":"Animals",
                "tokens":[
@@ -17,28 +15,16 @@
                   {
                      "word":"cat",
                      "count":7
-                  }
-               ]
-            },
-            {
-               "id",2,
-               "name":"Drama",
-               "tokens":[
+                  },
                   {
                      "word":"cry",
                      "count":2
                   }
-               ]
-            }
          ]
       },
       {
       	 "id":2,
          "title":"The Pool of Tears",
-         "themes":[
-            {
-               "id":1,
-               "name":"Animals",
                "tokens":[
                   {
                      "word":"rabbit",
@@ -53,32 +39,6 @@
                      "count":1
                   }
                ]
-            },
-            {
-               "id":2,
-               "name":"Drama",
-               "tokens":[
-                  {
-                     "word":"cry",
-                     "count":1
-                  },
-                  {
-                     "word":"sad",
-                     "count":2
-                  }
-               ]
-            },
-            {
-               "id":3,
-               "name":"Comedy",
-               "tokens":[
-                  {
-                     "word":"fun",
-                     "count":3
-                  }
-               ]
-            }
-         ]
       }
    ]
 }
