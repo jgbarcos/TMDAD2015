@@ -24,7 +24,7 @@ public class Tokenizer {
 	
 	private Map<String, String> chapterMap;
 	
-	private static final String chapterDelimiter = "^CHAPTER|^[IVXLCM]*$";
+	private static final String chapterDelimiter = "^CHAPTER|^Chapter|^[IVXLCM]*$";
 	private static final Pattern chapterPattern = Pattern.compile(chapterDelimiter);
 	private static final String titleDelimiter = "Title";	
 	private static final Pattern titlePattern = Pattern.compile(titleDelimiter);
