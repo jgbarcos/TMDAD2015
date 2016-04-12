@@ -1,15 +1,25 @@
 package es.unizar.tmdad.webgui.services.themesdb;
 
 public class PredefinedData {
+
 	public static void fillDataBase(MockupThemesDB db){
+
 		db.createTheme("Accion", 
+
 			"cuchillo", "lanza", "matar");
+
 		db.createTheme("Amor", 
+
 			"amor", "beso", "boda");
+
 		db.createTheme("Humor", 
+
 			"risa", "bromea");
+
 		db.createTheme("Animal", 
+
 			"gato", "conejo", "perro");
+
 		db.createTheme("Fantasy", 
 				"Queen", "King", "gryphon","mad","creature","creatures","heaven","Dwarfish","Elfin","Fey","Runes","Sorcerous","Thews","Wizardly","Gods","Magic");
 		db.createTheme("Comedy", 
@@ -36,5 +46,8 @@ public class PredefinedData {
 				"Actinic","Anomaly","Ansible","Continuum","Vortex","Enhanced","FTL","Wormhole","Nanites","Neutronium","Noosphere","Sentient","Singularity","Subspace","Terraform");
 		db.createTheme("Western", 
 				"Corral","Desperado","Gunslinger","Rugged","Sagebrush","Saloon","Solitary","Wrangler");
+
 	}
+
 }
+

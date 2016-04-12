@@ -31,7 +31,7 @@ public class SearchController {
 	}
 
 	@RequestMapping("/search")
-	public BookResult search(@RequestParam("book") String book, @RequestParam("themes[]") List<String> themes) {
+	public BookResult search(@RequestParam("bookID") String book, @RequestParam("themeInput") List<String> themes) {
 		return coordinator.performAnalysis(book, themes);
 	}
 }
