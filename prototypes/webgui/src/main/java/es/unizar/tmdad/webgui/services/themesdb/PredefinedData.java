@@ -4,7 +4,7 @@ public class PredefinedData {
 
 	public static void fillDataBase(MockupThemesDB db){
 
-		db.createTheme("Accion", 
+		/*db.createTheme("Accion", 
 
 			"cuchillo", "lanza", "matar");
 
@@ -18,7 +18,7 @@ public class PredefinedData {
 
 		db.createTheme("Animal", 
 
-			"gato", "conejo", "perro");
+			"gato", "conejo", "perro");*/
 
 		db.createTheme("Fantasy", 
 				"Queen", "King", "gryphon","mad","creature","creatures","heaven","Dwarfish","Elfin","Fey","Runes","Sorcerous","Thews","Wizardly","Gods","Magic");
