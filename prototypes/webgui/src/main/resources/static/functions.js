@@ -11,13 +11,13 @@ function extractLast( term ) {
 }
 
 function registerSearch() {
-	$("#search").submit(function(ev){
+	$("#analyze").submit(function(ev){
 		event.preventDefault();
 		// Split themeInput and clear empty fields like "", " "... etc
 		var themeList = split($("#themeInput").val()).filter(function(val){return val.trim()!=""});
 		$.get($(this).attr('action'), {book: $("#bookID").val(), themes: themeList}, function(data) {
 			var template = $('#resultTpl').html();
-			var rendered = Mustache.to_html(template, data)
+			var rendered = Mustache.to_html(template, JSON.parse(data))
 			$("#resultsBlock").empty().append(rendered);
 		});	
 	});
