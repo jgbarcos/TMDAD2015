@@ -26,10 +26,14 @@ public class Counter {
 		for (Map.Entry<String, String> entry : chapterMap.entrySet()) {
 			String cTitle = entry.getKey();
 			String cContent = entry.getValue();
-			Chapter chapter = new Chapter(i, cTitle);
-			bookTok.addChapter(chapter);
-			countChapterTokens(chapter, cContent, terms);
-			i++;
+			if(cTitle.equals("Title")){
+				bookTok.setTitle(cContent);
+			}else{
+				Chapter chapter = new Chapter(i, cTitle);
+				bookTok.addChapter(chapter);
+				countChapterTokens(chapter, cContent, terms);
+				i++;
+			}
 		} //TODO Migrate to Java 8 streams interface
 
 		return bookTok;
