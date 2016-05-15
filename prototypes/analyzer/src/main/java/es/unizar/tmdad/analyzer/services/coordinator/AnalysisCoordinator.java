@@ -3,6 +3,7 @@ import es.unizar.tmdad.analyzer.interfacing.BookRaw;
 import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
 import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
+import es.unizar.tmdad.analyzer.messaging.TokenizerRPCClient;
 import es.unizar.tmdad.analyzer.service.BookResult;
 import es.unizar.tmdad.analyzer.services.themesdb.MockupThemesDB;
 import es.unizar.tmdad.analyzer.services.themesdb.Theme;
@@ -58,7 +59,8 @@ public class AnalysisCoordinator {
 		
 		// Perform analysis
 		BookRaw bookRaw = callGateway(Integer.parseInt(id));
-		BookTokenized tokenized = callTokenizer(bookRaw,tokens);
+//		BookTokenized tokenized = callTokenizerREST(bookRaw,tokens);
+		BookTokenized tokenized = callTokenizerRPC(bookRaw,tokens); 
 		
 		// Format BookTokenized to BookResult (include theme information)
 		BookResult result = new BookResult(tokenized.getId(), tokenized.getTitle());
@@ -77,7 +79,7 @@ public class AnalysisCoordinator {
 		
 		return result;
 	}
-	
+
 	private BookRaw callGateway(int book){
 		
 	    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
@@ -87,7 +89,8 @@ public class AnalysisCoordinator {
 		
 	}
 	
-	private BookTokenized callTokenizer (BookRaw bookRaw, List<String> tokens){
+	//REST request
+	private BookTokenized callTokenizerREST (BookRaw bookRaw, List<String> tokens){
 		String url = "http://"+Tokenizer_Ip+":"+Tokenizer_Port+"/tokenize";
 		
 		// Only way to append parameter as a list, do not mix with RestTemplate uriVariables
@@ -95,6 +98,29 @@ public class AnalysisCoordinator {
 
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.postForObject(url,  bookRaw,  BookTokenized.class);
+	}
+	
+	private BookTokenized callTokenizerRPC(BookRaw bookRaw, List<String> tokens) {
+		TokenizerRPCClient tokenizerRpc = null;
+	    BookTokenized response = null;
+	    try {
+	    	tokenizerRpc = new TokenizerRPCClient();
+	    	System.out.println(" [x] Requesting tokenization via RPC...");
+	    	response = tokenizerRpc.call(bookRaw, tokens);
+	    	System.out.println(" [.] Got '" + response + "'");
+	    }
+	    catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    finally {
+	      if (tokenizerRpc!= null) {
+	        try {
+	        	tokenizerRpc.close();
+	        }
+	        catch (Exception ignore) {}
+	      }
+	    }
+		return response;
 	}
 	
 	private String arrayParams(String param, List<String> items){
