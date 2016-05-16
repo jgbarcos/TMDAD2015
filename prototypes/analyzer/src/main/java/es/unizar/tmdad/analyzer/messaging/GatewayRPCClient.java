@@ -1,30 +1,21 @@
 package es.unizar.tmdad.analyzer.messaging;
 
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
-import com.rabbitmq.client.Connection;
-
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-
-import javax.swing.event.ListSelectionEvent;
-
-import com.rabbitmq.client.AMQP.BasicProperties;
-
-import es.unizar.tmdad.analyzer.interfacing.BookRaw;
-import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
-import es.unizar.tmdad.analyzer.service.BookRawAndTerms;
 
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.AMQP.BasicProperties;
 
-public class TokenizerRPCClient {
-	
+import es.unizar.tmdad.analyzer.interfacing.BookRaw;
+
+public class GatewayRPCClient {
 	private Connection connection;
 	private Channel channel;
-	private static final String RPC_QUEUE_NAME = "rpc_queue_tokenizer";
+	private static final String RPC_QUEUE_NAME = "rpc_queue_gateway";
 	private static final String MESSAGING_HOST = "localhost";
 	private static final String CLOUD_AMQP_URL = "amqp://nsxkqaba:X4f5wyHcYgyDzQ1w6LMdOlv5fFaXsyHU@chicken.rmq.cloudamqp.com/nsxkqaba";
 	private String replyQueueName;
@@ -32,7 +23,7 @@ public class TokenizerRPCClient {
 	
 	private static final Gson GSON = new Gson();
 	
-	public TokenizerRPCClient() throws Exception{
+	public GatewayRPCClient()throws Exception{
 		ConnectionFactory factory = new ConnectionFactory();
 //	    factory.setHost(MESSAGING_HOST);
 	    factory.setUri(new URI(CLOUD_AMQP_URL));
@@ -44,7 +35,7 @@ public class TokenizerRPCClient {
 	    channel.basicConsume(replyQueueName, true, consumer);
 	}
 	
-	public BookTokenized call(BookRaw bookRaw, List<String> tokens) throws Exception {
+	public BookRaw call(String bookId) throws Exception {
 	    String response = null;
 	    String corrId = UUID.randomUUID().toString();
 
@@ -53,16 +44,7 @@ public class TokenizerRPCClient {
 	                                .correlationId(corrId)
 	                                .replyTo(replyQueueName)
 	                                .build();
-	    
-	    //Create message JSON -> Is this any kind of EIP??
-	    BookRawAndTerms bookRawAndTerms = new BookRawAndTerms(bookRaw.getId(), bookRaw.getContent(), tokens);
-	    String message = GSON.toJson(bookRawAndTerms);
-	    //CHECK
-	    BookRawAndTerms bookRawAndTerms2 = GSON.fromJson(message, BookRawAndTerms.class);
-	    if(bookRawAndTerms2 == bookRawAndTerms){
-	    	System.out.println("*** BookRawAndTerms aparently is Jsoning OK***");
-	    	System.out.println("TERMS: " +bookRawAndTerms2.getTerms().toArray().toString());
-	    }
+	    String message = bookId;
 	    //Publish message on default exchange, to the RPC queue
 	    channel.basicPublish("", RPC_QUEUE_NAME, props, message.getBytes("UTF-8"));
 
@@ -74,11 +56,10 @@ public class TokenizerRPCClient {
 	        break;
 	      }
 	    }
-	    return GSON.fromJson(response, BookTokenized.class);
+	    return GSON.fromJson(response, BookRaw.class);
 	  }
 
 	  public void close() throws Exception {
 	    connection.close();
 	  }
-	
 }

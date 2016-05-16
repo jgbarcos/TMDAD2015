@@ -3,6 +3,7 @@ import es.unizar.tmdad.analyzer.interfacing.BookRaw;
 import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
 import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
+import es.unizar.tmdad.analyzer.messaging.GatewayRPCClient;
 import es.unizar.tmdad.analyzer.messaging.TokenizerRPCClient;
 import es.unizar.tmdad.analyzer.service.BookResult;
 import es.unizar.tmdad.analyzer.services.themesdb.MockupThemesDB;
@@ -58,7 +59,8 @@ public class AnalysisCoordinator {
 		tokens = tokens.stream().distinct().collect(Collectors.toList());
 		
 		// Perform analysis
-		BookRaw bookRaw = callGateway(Integer.parseInt(id));
+//		BookRaw bookRaw = callGateway(Integer.parseInt(id));
+		BookRaw bookRaw = callGatewayRPC(id);
 //		BookTokenized tokenized = callTokenizerREST(bookRaw,tokens);
 		BookTokenized tokenized = callTokenizerRPC(bookRaw,tokens); 
 		
@@ -80,13 +82,36 @@ public class AnalysisCoordinator {
 		return result;
 	}
 
+	//REST request
 	private BookRaw callGateway(int book){
-		
-	    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
+	    String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
 		
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(url, BookRaw.class);
-		
+	}
+	
+	//RabbitMQ request
+	private BookRaw callGatewayRPC(String book){
+		GatewayRPCClient gatewayRpc = null;
+	    BookRaw response = null;
+	    try {
+	    	gatewayRpc = new GatewayRPCClient();
+	    	System.out.println(" [x] Requesting a book via RPC...");
+	    	response = gatewayRpc.call(book);
+	    	System.out.println(" [.] Got '" + response + "'");
+	    }
+	    catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    finally {
+	      if (gatewayRpc!= null) {
+	        try {
+	        	gatewayRpc.close();
+	        }
+	        catch (Exception ignore) {}
+	      }
+	    }
+		return response;
 	}
 	
 	//REST request
@@ -100,6 +125,7 @@ public class AnalysisCoordinator {
         return restTemplate.postForObject(url,  bookRaw,  BookTokenized.class);
 	}
 	
+	//RabbitMQ request
 	private BookTokenized callTokenizerRPC(BookRaw bookRaw, List<String> tokens) {
 		TokenizerRPCClient tokenizerRpc = null;
 	    BookTokenized response = null;

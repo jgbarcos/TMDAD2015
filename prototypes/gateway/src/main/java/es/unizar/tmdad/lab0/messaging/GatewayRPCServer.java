@@ -1,28 +1,23 @@
-package es.unizar.tmdad.messaging;
-
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.QueueingConsumer;
-
-import es.unizar.tmdad.service.BookRawAndTerms;
-import es.unizar.tmdad.service.BookTokenized;
-import es.unizar.tmdad.tokenizer.Counter;
-import es.unizar.tmdad.tokenizer.Tokenizer;
+package es.unizar.tmdad.lab0.messaging;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Map;
 
 import com.google.gson.Gson;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
-public class TokenizerRPCServer {
-	
-	private static final String RPC_QUEUE_NAME = "rpc_queue_tokenizer";
-	private static final String MESSAGING_HOST = "localhost";
-	private static final String CLOUD_AMQP_URL = "amqp://nsxkqaba:X4f5wyHcYgyDzQ1w6LMdOlv5fFaXsyHU@chicken.rmq.cloudamqp.com/nsxkqaba"; //amqp://user:pass@host:10000/vhost
+import es.unizar.tmdad.lab0.model.PieceOfBook;
+import es.unizar.tmdad.lab0.service.SerarchService;
 
+public class GatewayRPCServer {
+	private static final String RPC_QUEUE_NAME = "rpc_queue_gateway";
+	private static final String MESSAGING_HOST = "localhost";
+	private static final String CLOUD_AMQP_URL = "amqp://nsxkqaba:X4f5wyHcYgyDzQ1w6LMdOlv5fFaXsyHU@chicken.rmq.cloudamqp.com/nsxkqaba";
+	
 	private static final Gson GSON = new Gson();
 	
 	public static void launch(){
@@ -55,12 +50,10 @@ public class TokenizerRPCServer {
 	                                           .correlationId(props.getCorrelationId())
 	                                           .build();          
 	          try {
-	            String message = new String(delivery.getBody(),"UTF-8");
-	            //TODO Check if Message -> BookRaw + TermsList is OK
-	            BookRawAndTerms bookRawAndTerms = GSON.fromJson(message, BookRawAndTerms.class);
-	            System.out.println("TokenizerServer processing request...");
-	            BookTokenized bookTok = callTokenizer(bookRawAndTerms);
-	            response = GSON.toJson(bookTok);
+	            String bookId = new String(delivery.getBody(),"UTF-8");
+	            System.out.println("GatewayServer processing request...");
+	            PieceOfBook bookPiece = callGateway(bookId);
+	            response = GSON.toJson(bookPiece);
 	          }
 	          catch (Exception e){
 	            System.out.println(" [.] " + e.toString());
@@ -85,18 +78,9 @@ public class TokenizerRPCServer {
 	      }      		      
 	    }
 	
-	private static synchronized BookTokenized callTokenizer(BookRawAndTerms bookRawAndTerms) throws IOException{
+	private static synchronized PieceOfBook callGateway(String bookId) throws IOException{
 		//I don't like this synchronized solution... 
 		// But I will mantain it for now because calling this method in a static way could cause concurrency problems
-		BookTokenized bookTok = new BookTokenized(bookRawAndTerms.getId());
-		try{
-			Tokenizer tokenizer = new Tokenizer(bookRawAndTerms.getContent());
-			Map<String, String> chapters = tokenizer.tokenize();
-			Counter counter = new Counter(bookTok, chapters, bookRawAndTerms.getTerms());
-			return counter.countTerms();
-		}catch(IOException ioex){
-			System.out.println(ioex);
-			throw ioex;
-		}
+		return SerarchService.getBook(bookId, 1).get(0);
 	}
 }
