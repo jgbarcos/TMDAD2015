@@ -1,4 +1,4 @@
-package es.unizar.tmdad.analyzer.service;
+package es.unizar.tmdad.model;
 
 public class TokenResult {
 	private String word;

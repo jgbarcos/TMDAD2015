@@ -3,10 +3,11 @@ import es.unizar.tmdad.analyzer.interfacing.BookRaw;
 import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
 import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
-import es.unizar.tmdad.analyzer.service.BookResult;
+import es.unizar.tmdad.analyzer.service.AnalysisResource;
 import es.unizar.tmdad.analyzer.services.themesdb.MockupThemesDB;
 import es.unizar.tmdad.analyzer.services.themesdb.Theme;
 import es.unizar.tmdad.analyzer.services.themesdb.ThemesDB;
+import es.unizar.tmdad.model.BookResult;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,9 +21,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
  
+@Component
 public class AnalysisCoordinator {
 	//TODO externalize to properties file
 	private String Gateway_Ip = "localhost";
@@ -32,6 +35,10 @@ public class AnalysisCoordinator {
 	
 	private ThemesDB db;
 	
+	// id_libro | id_capitulo | id_termino | count
+	
+	// 
+	
 	public AnalysisCoordinator(){
 		db = new MockupThemesDB();
 	}
@@ -40,9 +47,9 @@ public class AnalysisCoordinator {
 		return db;
 	}
 	
-	public BookResult performAnalysis (String id , List<String> themeNames){
+	public void fillTokens(AnalysisResource resource){
 		// Get theme objects
-		List<Theme> themes = themeNames.stream()
+		List<Theme> themes = resource.themes.stream()
 				   .map(t -> db.getTheme(t))
 				   .filter(t -> t != null)
 				   .collect(Collectors.toList());
@@ -56,10 +63,23 @@ public class AnalysisCoordinator {
 		// Remove duplicates
 		tokens = tokens.stream().distinct().collect(Collectors.toList());
 		
+		resource.tokens = tokens;
+		resource.themeObjects = themes;
+	}
+	
+	public void performAnalysis(AnalysisResource resource){
+		fillTokens(resource);
+
 		// Perform analysis
-		BookRaw bookRaw = callGateway(Integer.parseInt(id));
-		BookTokenized tokenized = callTokenizer(bookRaw,tokens);
+		BookRaw bookRaw = callGateway(Integer.parseInt(resource.bookId));
+		BookTokenized tokenized = callTokenizer(bookRaw,resource.tokens);
 		
+		resource.result = formatResult(resource.themeObjects, tokenized);
+		
+		System.out.println("Analysis "+resource.resourceId+" performed!");
+	}
+
+	public BookResult formatResult(List<Theme> themes, BookTokenized tokenized) {
 		// Format BookTokenized to BookResult (include theme information)
 		BookResult result = new BookResult(tokenized.getId(), tokenized.getTitle());
 		for(Chapter ch : tokenized.getChapters()){
@@ -74,13 +94,12 @@ public class AnalysisCoordinator {
 				}
 			}
 		}
-		
 		return result;
 	}
 	
 	private BookRaw callGateway(int book){
 		
-	    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
+    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
 		
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(url, BookRaw.class);
