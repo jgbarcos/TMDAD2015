@@ -3,24 +3,23 @@ import es.unizar.tmdad.analyzer.interfacing.BookRaw;
 import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
 import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
-import es.unizar.tmdad.analyzer.service.AnalysisResource;
-import es.unizar.tmdad.analyzer.services.themesdb.MockupThemesDB;
-import es.unizar.tmdad.analyzer.services.themesdb.Theme;
-import es.unizar.tmdad.analyzer.services.themesdb.ThemesDB;
 import es.unizar.tmdad.model.BookResult;
+import es.unizar.tmdad.analyzer.services.db.AnalysisDB;
+import es.unizar.tmdad.analyzer.services.db.AnalysisDBMockup;
+import es.unizar.tmdad.analyzer.services.db.BookAnalysisDAO;
+import es.unizar.tmdad.analyzer.services.db.BookDAO;
+import es.unizar.tmdad.analyzer.services.db.ChapterAnalysisDAO;
+import es.unizar.tmdad.analyzer.services.db.ResourceDAO;
+import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,73 +32,87 @@ public class AnalysisCoordinator {
 	private String Tokenizer_Ip = "localhost";
 	private int Tokenizer_Port = 8090;
 	
-	private ThemesDB db;
-	
-	// id_libro | id_capitulo | id_termino | count
-	
-	// 
+	private AnalysisDB db;
 	
 	public AnalysisCoordinator(){
-		db = new MockupThemesDB();
+		db = new AnalysisDBMockup();
 	}
 	
-	public ThemesDB getDb(){
+	public AnalysisDB getDb(){
 		return db;
 	}
 	
-	public void fillTokens(AnalysisResource resource){
-		// Get theme objects
-		List<Theme> themes = resource.themes.stream()
-				   .map(t -> db.getTheme(t))
-				   .filter(t -> t != null)
-				   .collect(Collectors.toList());
+	@Async
+	public void runAnalysis(ResourceDAO resource){
 		
-		// Get list of tokens
-		List<String> tokens = new ArrayList<>();
-		for(Theme t : themes){
-			tokens.addAll(t.getTokens());
+		//Get tokens
+		List<String> tokens = resource.getTag().values().stream()
+			.flatMap(List::stream)
+			.distinct()
+			.collect(Collectors.toList());
+		
+
+		getDb().updateResourceStatusById(resource.getId(), ResourceStatus.GATEWAY);
+		BookRaw bookRaw = callGateway(resource.getBookId());
+
+		// TODO: tokenizer should not return anything
+		getDb().updateResourceStatusById(resource.getId(), ResourceStatus.TOKENIZER);
+		BookTokenized tokenized = callTokenizer(bookRaw, tokens);
+		
+		// TODO: this should be done by the tokenizer when book info is known
+		// Add book info
+		List<String> chapterNames = new ArrayList<String>();
+		for(Chapter ch : tokenized.getChapters()){
+			chapterNames.add(ch.getTitle());
 		}
 		
-		// Remove duplicates
-		tokens = tokens.stream().distinct().collect(Collectors.toList());
+		BookDAO book = new BookDAO(resource.getBookId(), tokenized.getTitle(), chapterNames);
+		getDb().createBook(book);	
 		
-		resource.tokens = tokens;
-		resource.themeObjects = themes;
-	}
-	
-	public void performAnalysis(AnalysisResource resource){
-		fillTokens(resource);
-
-		// Perform analysis
-		BookRaw bookRaw = callGateway(Integer.parseInt(resource.bookId));
-		BookTokenized tokenized = callTokenizer(bookRaw,resource.tokens);
-		
-		resource.result = formatResult(resource.themeObjects, tokenized);
-		
-		System.out.println("Analysis "+resource.resourceId+" performed!");
-	}
-
-	public BookResult formatResult(List<Theme> themes, BookTokenized tokenized) {
-		// Format BookTokenized to BookResult (include theme information)
-		BookResult result = new BookResult(tokenized.getId(), tokenized.getTitle());
+		// TODO: this should be done by the tokenizer whenever a new token count is obtained
+		// Add tokens as analyzed
 		for(Chapter ch : tokenized.getChapters()){
 			for(Token tk : ch.getTokens()){
-				for(Theme th : themes){
-					// Check if theme contains token
-					if(th.getTokens().contains(tk.getWord())){
-						result.addToken(th.getTitle(), 
-							ch.getId(), ch.getTitle(), 
-							tk.getWord(), tk.getCount());
-					}
+				getDb().createAnalysis(resource.getBookId(), ch.getId(), tk.getWord(),  tk.getCount());
+			}
+		}
+
+		// TODO: this should be done by the tokenizer
+		getDb().updateResourceStatusById(resource.getId(), ResourceStatus.FINISHED);
+		
+	}
+	
+	public BookResult recoverResult(long resourceId) {
+		ResourceDAO resource = getDb().findResourceById(resourceId);
+		
+		//Get tokens
+		List<String> tokens = resource.getTag().values().stream()
+			.flatMap(List::stream)
+			.distinct()
+			.collect(Collectors.toList());
+		
+		BookAnalysisDAO analysis = getDb().findAnalysisByBookAndTokens(resource.getBookId(), tokens);
+		
+		BookResult result = new BookResult(analysis.getId(), analysis.getTitle());
+		for(ChapterAnalysisDAO ch : analysis.getChapters()){				
+			for(String theme : resource.getTag().keySet()){
+				for(String token : resource.getTag().get(theme)){
+					long count = ch.getCounts().getOrDefault(token, 0L);
+					result.addToken(theme, (int)ch.getNumChapter(), ch.getTitle(), token, count);
+					
 				}
 			}
 		}
+		
+		result.setStatus(resource.getStatus());
+		
 		return result;
 	}
 	
-	private BookRaw callGateway(int book){
+	
+	private BookRaw callGateway(long l){
 		
-    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+book;		
+    	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+l;		
 		
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(url, BookRaw.class);

@@ -1,5 +1,6 @@
 package es.unizar.tmdad.analyzer.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,41 +10,38 @@ import org.springframework.stereotype.Component;
 
 import es.unizar.tmdad.analyzer.services.coordinator.AnalysisCoordinator;
 import es.unizar.tmdad.model.BookResult;
+import es.unizar.tmdad.analyzer.services.db.ResourceDAO;
+import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
+import es.unizar.tmdad.analyzer.services.db.ThemeDAO;
 
 @Component
 public class AnalysisResourceManager {
 	
 	@Autowired
-    AsyncAnalysis asyncAnalysis;
-	
-	@Autowired
 	AnalysisCoordinator coordinator;
 	
-	private long countResource = 0;
-	private Map<String, AnalysisResource> resources = new HashMap<String, AnalysisResource>();
-	
-	synchronized public long requestResourceId(){
-		long val = countResource;
-		countResource++;
-		return val;
+	public long createAnalysis(String userId, long bookId, List<String> themes){	
+		
+		List<ThemeDAO> themesDAO = new ArrayList<ThemeDAO>();
+		for(String th : themes){
+			themesDAO.add(coordinator.getDb().findThemeByUsernameAndTitle(userId, th));
+		}
+		
+		ResourceDAO resource = new ResourceDAO(bookId, userId, themesDAO);
+		long id = coordinator.getDb().createResource(resource);
+		
+		coordinator.runAnalysis(resource);
+		
+		return id;
 	}
 	
-	public String createAnalysis(String bookId, List<String> themes){
-		long id = requestResourceId();
-		String idstr = Long.toString(id);
-
-		AnalysisResource res = new AnalysisResource(idstr, bookId, themes);
-		resources.put(idstr, res);
-		asyncAnalysis.startAnalysis(res);
+	public BookResult getResult(long resourceId){
+		ResourceStatus status = coordinator.getDb().findResourceStatusById(resourceId);
+		if(status != ResourceStatus.FINISHED){
+			return new BookResult(resourceId, status);
+		}
 		
-		System.out.println("Returning analysis id");
-		
-		return idstr;
-	}
-	
-	public BookResult getResult(String resourceId){
-		AnalysisResource res = resources.get(resourceId);
-		return res.result;
+		return coordinator.recoverResult(resourceId);
 	}
 	
 }
