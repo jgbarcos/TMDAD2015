@@ -49,6 +49,8 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     
     compile("commons-lang:commons-lang:2.6")
+    compile("com.rabbitmq:amqp-client:3.6.1")
+    compile("com.google.code.gson:gson:2.6.2")
 }
 
 eclipse {

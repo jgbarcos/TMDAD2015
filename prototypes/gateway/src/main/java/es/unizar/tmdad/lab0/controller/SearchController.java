@@ -14,7 +14,6 @@ public class SearchController {
 
     @RequestMapping("/searchBook")
     public PieceOfBook search(@RequestParam("book") String bookId) {
-		
 		return SerarchService.getBook(bookId, 1).get(0);
     }
 }

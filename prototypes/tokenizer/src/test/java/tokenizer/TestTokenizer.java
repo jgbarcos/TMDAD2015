@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +31,7 @@ import es.unizar.tmdad.tokenizer.Tokenizer;
 public class TestTokenizer {
 	
 	@Test
-	public void testTokenizer(){
+	public void testTokenizerAndCounter(){
 		BookRaw bookRaw = createBookRaw();
 		//Terms
 		List<String> terms = createTerms();
@@ -54,6 +56,28 @@ public class TestTokenizer {
 		long elapsedTime = stopTime - startTime;
 		System.out.println("===> It tooks " + elapsedTime + " miliseconds to tokenize the book.");
 		checkResults(bookTok);
+	}
+	
+	@Test
+	public void testTokenizer(){
+		BookRaw bookRaw = createBookRaw();
+		//BookRaw -> BookTokenized
+		System.out.println("BOOK CONTENT: " + bookRaw.getContent().substring(0, 200) + "...");
+		
+		Map<String,String> chapters = null;
+		long startTime = System.currentTimeMillis();
+		try{
+			Tokenizer tokenizer = new Tokenizer(bookRaw.getContent());
+			chapters = tokenizer.tokenize();
+			}catch(IOException ioex){
+				//TODO It should return some standard error
+				Assert.fail(ioex.getMessage());
+			}
+		Assert.assertNotNull(chapters);
+		long stopTime = System.currentTimeMillis();
+		long elapsedTime = stopTime - startTime;
+		System.out.println("===> It tooks " + elapsedTime + " miliseconds to get chapters.");
+		checkResults(chapters);
 	}
 	
 	private BookRaw createBookRaw(){
@@ -97,6 +121,15 @@ public class TestTokenizer {
 			for(Token token:tokens){
 				System.out.println("\t\t" + token.getWord() + "-" + token.getCount());
 			}
+		}
+	}
+	
+	private void checkResults(Map<String,String> chapters){
+		System.out.println("*** CHAPTERS ***");
+		Iterator<Entry<String, String>> cIterator = chapters.entrySet().iterator();
+		while(cIterator.hasNext()){
+			Entry<String, String> chapterEntry = cIterator.next();
+			System.out.println(chapterEntry.getKey());
 		}
 	}
 }

@@ -3,6 +3,7 @@ import es.unizar.tmdad.analyzer.interfacing.BookRaw;
 import es.unizar.tmdad.analyzer.interfacing.BookTokenized;
 import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
+
 import es.unizar.tmdad.model.BookResult;
 import es.unizar.tmdad.analyzer.services.db.AnalysisDB;
 import es.unizar.tmdad.analyzer.services.db.AnalysisDBMockup;
@@ -11,6 +12,10 @@ import es.unizar.tmdad.analyzer.services.db.BookDAO;
 import es.unizar.tmdad.analyzer.services.db.ChapterAnalysisDAO;
 import es.unizar.tmdad.analyzer.services.db.ResourceDAO;
 import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
+
+import es.unizar.tmdad.analyzer.messaging.GatewayRPCClient;
+import es.unizar.tmdad.analyzer.messaging.TokenizerRPCClient;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,11 +58,11 @@ public class AnalysisCoordinator {
 		
 
 		getDb().updateResourceStatusById(resource.getId(), ResourceStatus.GATEWAY);
-		BookRaw bookRaw = callGateway(resource.getBookId());
+		BookRaw bookRaw = callGatewayRPC(Long.toString(resource.getBookId()));
 
 		// TODO: tokenizer should not return anything
 		getDb().updateResourceStatusById(resource.getId(), ResourceStatus.TOKENIZER);
-		BookTokenized tokenized = callTokenizer(bookRaw, tokens);
+		BookTokenized tokenized = callTokenizerRPC(bookRaw, tokens);
 		
 		// TODO: this should be done by the tokenizer when book info is known
 		// Add book info
@@ -107,19 +112,42 @@ public class AnalysisCoordinator {
 		result.setStatus(resource.getStatus());
 		
 		return result;
-	}
+	}	
 	
-	
-	private BookRaw callGateway(long l){
+	private BookRaw callGatewayREST(long l){
 		
     	String url = "http://"+Gateway_Ip+":"+Gateway_Port+"/searchBook?book="+l;		
 		
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(url, BookRaw.class);
-		
 	}
 	
-	private BookTokenized callTokenizer (BookRaw bookRaw, List<String> tokens){
+	//RabbitMQ request
+	private BookRaw callGatewayRPC(String book){
+		GatewayRPCClient gatewayRpc = null;
+	    BookRaw response = null;
+	    try {
+	    	gatewayRpc = new GatewayRPCClient();
+	    	System.out.println(" [x] Requesting a book via RPC...");
+	    	response = gatewayRpc.call(book);
+	    	System.out.println(" [.] Got '" + response + "'");
+	    }
+	    catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    finally {
+	      if (gatewayRpc!= null) {
+	        try {
+	        	gatewayRpc.close();
+	        }
+	        catch (Exception ignore) {}
+	      }
+	    }
+		return response;
+	}
+	
+	//REST request
+	private BookTokenized callTokenizerREST (BookRaw bookRaw, List<String> tokens){
 		String url = "http://"+Tokenizer_Ip+":"+Tokenizer_Port+"/tokenize";
 		
 		// Only way to append parameter as a list, do not mix with RestTemplate uriVariables
@@ -127,6 +155,30 @@ public class AnalysisCoordinator {
 
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.postForObject(url,  bookRaw,  BookTokenized.class);
+	}
+	
+	//RabbitMQ request
+	private BookTokenized callTokenizerRPC(BookRaw bookRaw, List<String> tokens) {
+		TokenizerRPCClient tokenizerRpc = null;
+	    BookTokenized response = null;
+	    try {
+	    	tokenizerRpc = new TokenizerRPCClient();
+	    	System.out.println(" [x] Requesting tokenization via RPC...");
+	    	response = tokenizerRpc.call(bookRaw, tokens);
+	    	System.out.println(" [.] Got '" + response + "'");
+	    }
+	    catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    finally {
+	      if (tokenizerRpc!= null) {
+	        try {
+	        	tokenizerRpc.close();
+	        }
+	        catch (Exception ignore) {}
+	      }
+	    }
+		return response;
 	}
 	
 	private String arrayParams(String param, List<String> items){

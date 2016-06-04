@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -62,6 +63,7 @@ public class SerarchService {
 			BufferedReader br = null;
 			String book = "";
 			br = new BufferedReader(new FileReader(getPathBook(bookId)));
+//			br = new BufferedReader(new InputStreamReader(new FileInputStream("src\\main\\resources\\Alice's Adventures in Wonderland")));
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				book+=line+"\n";
@@ -70,6 +72,7 @@ public class SerarchService {
 			PieceOfBook  pieceOfBook = new PieceOfBook(bookId, book, 1, 1);
 			ArrayList<PieceOfBook> lst = new ArrayList<>();
 			lst.add(pieceOfBook);
+			br.close();
 			return  lst;
 			 
 		} catch (Exception e) {
