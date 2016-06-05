@@ -1,13 +1,24 @@
-package es.unizar.tmdad.analyzer.service;
+package es.unizar.tmdad.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
+
 public class BookResult {
 	private long id;
 	private String title;
+	private ResourceStatus status;
 	private List<ChapterResult> chapters;
 	private List<ThemeResult> themes;
+	
+	public BookResult(long id, ResourceStatus status){
+		this.id = id;
+		this.setStatus(status);
+		title = null;
+		chapters = null;
+		themes = null;
+	}
 	
 	public BookResult(long id, String title){
 		this.id = id;
@@ -51,6 +62,14 @@ public class BookResult {
 	
 	public List<ChapterResult> getChapters(){
 		return chapters;
+	}
+
+	public ResourceStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ResourceStatus status) {
+		this.status = status;
 	}
 
 	

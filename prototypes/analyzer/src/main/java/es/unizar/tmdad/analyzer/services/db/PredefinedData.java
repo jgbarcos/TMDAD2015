@@ -1,4 +1,4 @@
-package mockupdb;
+package es.unizar.tmdad.analyzer.services.db;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package es.unizar.tmdad.analyzer.service;
+package es.unizar.tmdad.model;
 
 import java.util.ArrayList;
 import java.util.List;
