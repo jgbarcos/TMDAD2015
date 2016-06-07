@@ -5,23 +5,38 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-import es.unizar.tmdad.dbmodel.User;
+import es.unizar.tmdad.dbmodel.Book;
 
 public class BookDAO {
 	
-	public void insertBook(User user) {
+	public void createBook(Book book) {
 		Connection conn = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String insertUserSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".USER (username, password) VALUES (?,?)";
+			
+			String insertBookSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".BOOK (id, title) VALUES (?,?)";
 			PreparedStatement pstmt;
-			pstmt = conn.prepareStatement(insertUserSQL);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
+			pstmt = conn.prepareStatement(insertBookSQL);
+			pstmt.setLong(1, book.getId());
+			pstmt.setString(2, book.getTitle());
 			pstmt.executeUpdate();
 			pstmt.close();
+			
+			String insertChapterSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".CHAPTER (book, num, title) VALUES (?,?,?)";
+			PreparedStatement pstmt2;
+			pstmt2 = conn.prepareStatement(insertChapterSQL);
+			
+			for (int i = 0; i < book.getChapters().size(); i++) {
+				pstmt2.setLong(1, book.getId());
+				pstmt2.setInt(2, i+1);
+				pstmt2.setString(3, book.getChapters().get(i));
+				pstmt2.executeUpdate();
+			}	
+			pstmt2.close();
+			
 			conn.close();		
 		} catch (SQLException e) {
 			e.printStackTrace();			
@@ -36,35 +51,52 @@ public class BookDAO {
 			e.printStackTrace();
 		}
 	}
-	
-	public boolean validateUser(User user) {
+
+	public Book findBookById(long bookId) {
 		Connection conn = null;
-		PreparedStatement pstmt;
-		boolean found = false;
+		Book book = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String validateUserSQL = "SELECT * FROM " + DatabaseConstants.dbSchema + ".USER WHERE username=? AND password=?";
-			
-			pstmt = conn.prepareStatement(validateUserSQL);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
+			String selectBookSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".BOOK "
+					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".CHAPTER "
+					+ "ON " + DatabaseConstants.dbSchema + ".BOOK.id=" + DatabaseConstants.dbSchema + ".CHAPTER.book "
+					+ "WHERE " + DatabaseConstants.dbSchema + ".BOOK.id=?"
+					+ "ORDER BY " + DatabaseConstants.dbSchema + ".CHAPTER.num ASC";
+
+			PreparedStatement pstmt;
+			pstmt = conn.prepareStatement(selectBookSQL);
+			pstmt.setLong(1, bookId);
+			pstmt.executeUpdate();
 			
 			ResultSet rs = pstmt.executeQuery();
 
-			if (rs.next()) {
-				found = true;
-			}
+			String chapterTitle;
+			while (rs.next()) {
+				if (book==null) {
+					String title = rs.getString(DatabaseConstants.dbSchema + ".BOOK.title");
+					book = new Book(bookId, title, new ArrayList<String>());
+				}
+				chapterTitle = rs.getString(DatabaseConstants.dbSchema + ".CHAPTER.title");
+				book.getChapters().add(chapterTitle);
+			}				
 			pstmt.close();
-			conn.close();
 			
+			conn.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace();			
+			if (conn!=null) {
+				try {
+					conn.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
-		
-		return found;
+		}
+		return book;
 	}
 
 }

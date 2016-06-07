@@ -16,7 +16,7 @@ import es.unizar.tmdad.dbmodel.Theme;
 
 public class ThemeDAO {
 	
-	public long insertTheme(Theme theme, String username) {
+	public long createThemeOfUser(String username, Theme theme) {
 		Connection conn = null;
 		long themeId = -1;
 		try {
@@ -166,8 +166,11 @@ public class ThemeDAO {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String themesFromUserSQL = "SELECT * FROM " + DatabaseConstants.dbSchema + ".THEME INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME ON "
-					 + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme WHERE themeOwner=?";
+			String themesFromUserSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".THEME "
+					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME "
+					+ "ON " + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme "
+					+ "WHERE themeOwner=?";
 			
 			pstmt = conn.prepareStatement(themesFromUserSQL);
 			pstmt.setString(1, username);
@@ -179,9 +182,9 @@ public class ThemeDAO {
 			String term;
 			Theme theme;
 			while (rs.next()) {
-				themeId = rs.getLong("id");
-				themeName = rs.getString("name");
-				term = rs.getString("term");
+				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
+				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
+				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
 				if (!themes.containsKey(themeId)) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 					themes.put(themeId, theme);
@@ -209,9 +212,11 @@ public class ThemeDAO {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String themesFromUserSQL = "SELECT * FROM " + DatabaseConstants.dbSchema + ".THEME INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME ON "
-					 + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme WHERE " + DatabaseConstants.dbSchema 
-					 + ".THEME.themeOwner=? AND " + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme WHERE " + DatabaseConstants.dbSchema + ".THEME.id=?";
+			String themesFromUserSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".THEME "
+					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME "
+					+ "ON " + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme "
+					+ "WHERE " + DatabaseConstants.dbSchema + ".THEME.themeOwner=? AND " + DatabaseConstants.dbSchema + ".THEME.id=?";
 			 
 			pstmt = conn.prepareStatement(themesFromUserSQL);
 			pstmt.setString(1, username);
@@ -222,8 +227,8 @@ public class ThemeDAO {
 			String themeName;
 			String term;
 			while (rs.next()) {
-				themeName = rs.getString("name");
-				term = rs.getString("term");
+				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
+				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
 				if (theme==null) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 				} 
@@ -241,63 +246,41 @@ public class ThemeDAO {
 		return theme;
 
 	}
-	
-	/*private void deleteUserThemes(User user) {
+
+	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
 		Connection conn = null;
 		PreparedStatement pstmt;
-		List<Theme> themes = new ArrayList<>();
-		Map<String, List<String>> termsFromTheme = new HashMap<String, List<String>>();
+		Map<Long, Theme> themes = new HashMap<>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String themesFromUserSQL = "DELETE FROM " + DatabaseConstants.dbSchema + ".TERM_IN_THEME WHERE themeOwner=?";
+			String themesFromUserSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".THEME "
+					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME "
+					+ "ON " + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme "
+					+ "WHERE themeOwner=? AND " + DatabaseConstants.dbSchema + ".THEME.name like ?";
 			
 			pstmt = conn.prepareStatement(themesFromUserSQL);
-			pstmt.setString(1, user.getUsername());
-			
-			pstmt.executeUpdate();
-
-			String insertThemeSQL
-			pstmt.close();
-			conn.close();
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} 
-	
-		Theme theme;
-		for (String themeName : termsFromTheme.keySet()) {
-			theme = new Theme(themeName, termsFromTheme.get(themeName));
-			themes.add(theme);
-		}
-		
-		return themes;
-	}*/
-
-	/*public void updateUserThemes(User u) {
-		Connection conn = null;
-		PreparedStatement pstmt;
-		List<Theme> themes = new ArrayList<>();
-		Map<String, List<String>> termsFromTheme = new HashMap<String, List<String>>();
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(dbUrl, "root", "root");
-			String themesFromUserSQL = "SELECT * FROM " + DatabaseConstants.dbSchema + ".TERM_IN_THEME WHERE themeOwner=?";
-			
-			pstmt = conn.prepareStatement(themesFromUserSQL);
-			pstmt.setString(1, user.getUsername());
+			pstmt.setString(1, username);
+			pstmt.setString(2, likeThemeName + "%");
 			
 			ResultSet rs = pstmt.executeQuery();
 
+			long themeId;
 			String themeName;
+			String term;
+			Theme theme;
 			while (rs.next()) {
-				themeName = rs.getString("name");
-				if (!termsFromTheme.containsKey(themeName)) {
-					termsFromTheme.put(themeName, new ArrayList<>());
+				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
+				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
+				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				if (!themes.containsKey(themeId)) {
+					theme = new Theme(themeId, themeName, new HashSet<String>());
+					themes.put(themeId, theme);
+				} else {
+					theme = themes.get(themeId);
 				}
-				termsFromTheme.get(themeName).add(rs.getString("term"));
+				theme.getTerms().add(term);
 			}
 			pstmt.close();
 			conn.close();
@@ -307,14 +290,91 @@ public class ThemeDAO {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} 
-	
-		Theme theme;
-		for (String themeName : termsFromTheme.keySet()) {
-			theme = new Theme(themeName, termsFromTheme.get(themeName));
-			themes.add(theme);
-		}
 		
 		return themes;
-	}*/
+	}
+
+	public Theme findThemeByUsernameAndThemeName(String username, String themeName) {
+		Connection conn = null;
+		PreparedStatement pstmt;
+		Theme theme = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
+			String themesFromUserSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".THEME "
+					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".TERM_IN_THEME "
+					+ "ON " + DatabaseConstants.dbSchema + ".THEME.id=" + DatabaseConstants.dbSchema + ".TERM_IN_THEME.theme "
+					+ "WHERE " + DatabaseConstants.dbSchema + ".THEME.themeOwner=? AND " + DatabaseConstants.dbSchema + ".THEME.name=?";
+			 
+			pstmt = conn.prepareStatement(themesFromUserSQL);
+			pstmt.setString(1, username);
+			pstmt.setString(2, themeName);
+			
+			ResultSet rs = pstmt.executeQuery();
+
+			long themeId;
+			String term;
+			while (rs.next()) {
+				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
+				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				if (theme==null) {
+					theme = new Theme(themeId, themeName, new HashSet<String>());
+				} 
+				theme.getTerms().add(term);
+			}
+			pstmt.close();
+			conn.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} 
+		
+		return theme;
+	}
+
+	public long updateThemeOfUser(String username, Theme theme) {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
+			String deleteTermsOfThemeSQL = "DELETE FROM " + DatabaseConstants.dbSchema + ".TERM_IN_THEME WHERE theme=?";
+
+			PreparedStatement pstmt;
+			pstmt = conn.prepareStatement(deleteTermsOfThemeSQL);
+			pstmt.setLong(1, theme.getId());
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			String insertTermOfThemeSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".TERM_IN_THEME(term, theme) VALUES (?,?)";
+
+			PreparedStatement pstmt2;
+			pstmt2 = conn.prepareStatement(insertTermOfThemeSQL);
+			
+			for (Iterator<String> iterator = theme.getTerms().iterator(); iterator.hasNext();) {
+				String term = (String) iterator.next();
+				pstmt2.setString(1, term);
+				pstmt2.setLong(2, theme.getId());
+				pstmt2.executeUpdate();
+			}
+			pstmt2.close();
+			
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();			
+			if (conn!=null) {
+				try {
+					conn.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return theme.getId();
+	}
 	
 }

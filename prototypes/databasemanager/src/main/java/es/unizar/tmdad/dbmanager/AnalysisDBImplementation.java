@@ -3,6 +3,7 @@ package es.unizar.tmdad.dbmanager;
 import java.util.List;
 import java.util.Map;
 
+import es.unizar.tmdad.dbconnecton.BookDAO;
 import es.unizar.tmdad.dbconnecton.ThemeDAO;
 import es.unizar.tmdad.dbconnecton.UserDAO;
 import es.unizar.tmdad.dbmodel.Analysis;
@@ -10,22 +11,19 @@ import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
 import es.unizar.tmdad.dbmodel.ResourceStatus;
 import es.unizar.tmdad.dbmodel.Theme;
-import es.unizar.tmdad.dbmodel.User;
 
 public class AnalysisDBImplementation implements AnalysisDB {
 
 	@Override
 	public void createUser(String username, String password) {
-		User u = new User(username, password);
 		UserDAO dao = new UserDAO();
-		dao.insertUser(u);	
+		dao.createUser(username, password);	
 	}
 	
 	@Override
 	public boolean validateUser(String username, String password) {
-		User u = new User(username, password);
 		UserDAO dao = new UserDAO();
-		return dao.validateUser(u);
+		return dao.validateUser(username, password);
 	}
 
 	@Override
@@ -35,9 +33,9 @@ public class AnalysisDBImplementation implements AnalysisDB {
 	}
 
 	@Override
-	public List<Theme> findThemeByUsernameLikeTitle(String username, String like) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
+		ThemeDAO dao = new ThemeDAO();
+		return dao.findThemeByUsernameLikeThemeName(username, likeThemeName);
 	}
 
 	@Override
@@ -47,32 +45,33 @@ public class AnalysisDBImplementation implements AnalysisDB {
 	}
 
 	@Override
-	public Theme findThemeByUsernameAndThemeName(String username, String themeTitle) {
-		// TODO Auto-generated method stub
-		return null;
+	public Theme findThemeByUsernameAndThemeName(String username, String themeName) {
+		ThemeDAO dao = new ThemeDAO();
+		return dao.findThemeByUsernameAndThemeName(username, themeName);
 	}
 
 	@Override
 	public long createThemeOfUser(String username, Theme theme) {
 		ThemeDAO dao = new ThemeDAO();
-		return dao.insertTheme(theme, username);
+		return dao.createThemeOfUser(username, theme);
 	}
 
 	@Override
 	public long updateThemeOfUser(String username, Theme theme) {
-		// TODO Auto-generated method stub
-		return 0;
+		ThemeDAO dao = new ThemeDAO();
+		return dao.updateThemeOfUser(username, theme);
 	}
 
 	@Override
 	public void createBook(Book book) {
-		
+		BookDAO dao = new BookDAO();
+		dao.createBook(book);
 	}
 
 	@Override
 	public Book findBookById(long bookId) {
-		// TODO Auto-generated method stub
-		return null;
+		BookDAO dao = new BookDAO();
+		return dao.findBookById(bookId);
 	}
 
 	@Override

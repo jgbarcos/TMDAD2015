@@ -17,15 +17,17 @@ public interface AnalysisDB {
 	public void createUser(String username, String password);
 	public boolean validateUser(String username, String password);
 	
+	/*
+	 * Theme Data
+	 */
 	public Map<Long, Theme> findAllThemeByUsername(String username);
-	public List<Theme> findThemeByUsernameLikeTitle(String username, String like);
+	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName);
 	
 	public Theme findThemeByUsernameAndThemeId(String username, long themeId);
 	public Theme findThemeByUsernameAndThemeName(String username, String themeName);
 	
 	public long createThemeOfUser(String username, Theme theme);
 	public long updateThemeOfUser(String username, Theme theme);
-	
 	
 	/*
 	 * Book Data

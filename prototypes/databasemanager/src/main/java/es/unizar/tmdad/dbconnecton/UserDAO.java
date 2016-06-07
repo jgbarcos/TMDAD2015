@@ -6,11 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import es.unizar.tmdad.dbmodel.User;
-
 public class UserDAO {
 	
-	public void insertUser(User user) {
+	public void createUser(String username, String password) {
 		Connection conn = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -18,8 +16,8 @@ public class UserDAO {
 			String insertUserSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".USER (username, password) VALUES (?,?)";
 			PreparedStatement pstmt;
 			pstmt = conn.prepareStatement(insertUserSQL);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
+			pstmt.setString(1, username);
+			pstmt.setString(2, password);
 			pstmt.executeUpdate();
 			pstmt.close();
 			conn.close();		
@@ -37,18 +35,20 @@ public class UserDAO {
 		}
 	}
 	
-	public boolean validateUser(User user) {
+	public boolean validateUser(String username, String password) {
 		Connection conn = null;
 		PreparedStatement pstmt;
 		boolean found = false;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String validateUserSQL = "SELECT * FROM " + DatabaseConstants.dbSchema + ".USER WHERE username=? AND password=?";
+			String validateUserSQL = "SELECT * "
+					+ "FROM " + DatabaseConstants.dbSchema + ".USER "
+					+ "WHERE username=? AND password=?";
 			
 			pstmt = conn.prepareStatement(validateUserSQL);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
+			pstmt.setString(1, username);
+			pstmt.setString(2, password);
 			
 			ResultSet rs = pstmt.executeQuery();
 
