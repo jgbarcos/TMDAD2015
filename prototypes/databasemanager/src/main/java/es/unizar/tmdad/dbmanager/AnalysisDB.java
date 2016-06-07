@@ -1,9 +1,9 @@
 package es.unizar.tmdad.dbmanager;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import es.unizar.tmdad.dbmodel.Analysis;
+import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
 import es.unizar.tmdad.dbmodel.ResourceStatus;
@@ -38,10 +38,10 @@ public interface AnalysisDB {
 	/*
 	 * Analysis Data
 	 */
-	public void createAnalysis(long bookId, long chapterNum, String token, long count);
+	public void createAnalysis(long bookId, long chapterNum, String term, long count);
 	
-	public long getAnalysisOfToken(long bookId, long chapterNum, String token);
-	public Analysis findAnalysisByBookAndTokens(long bookId, List<String> tokens);
+	public long getAnalysisOfTerm(long bookId, long chapterNum, String term);
+	public BookAnalysis findAnalysisByBookAndTerms(long bookId, Set<String> terms);
 	
 	/*
 	 * Resource Data

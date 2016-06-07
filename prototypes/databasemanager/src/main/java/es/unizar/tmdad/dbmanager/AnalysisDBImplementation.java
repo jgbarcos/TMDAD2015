@@ -1,12 +1,13 @@
 package es.unizar.tmdad.dbmanager;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import es.unizar.tmdad.dbconnecton.AnalysisDAO;
 import es.unizar.tmdad.dbconnecton.BookDAO;
 import es.unizar.tmdad.dbconnecton.ThemeDAO;
 import es.unizar.tmdad.dbconnecton.UserDAO;
-import es.unizar.tmdad.dbmodel.Analysis;
+import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
 import es.unizar.tmdad.dbmodel.ResourceStatus;
@@ -75,21 +76,21 @@ public class AnalysisDBImplementation implements AnalysisDB {
 	}
 
 	@Override
-	public void createAnalysis(long bookId, long chapterNum, String token, long count) {
-		// TODO Auto-generated method stub
-		
+	public void createAnalysis(long bookId, long chapterNum, String term, long count) {
+		AnalysisDAO dao = new AnalysisDAO();
+		dao.createAnalysis(bookId, chapterNum, term, count);
 	}
 
 	@Override
-	public long getAnalysisOfToken(long bookId, long chapterNum, String token) {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getAnalysisOfTerm(long bookId, long chapterNum, String term) {
+		AnalysisDAO dao = new AnalysisDAO();
+		return dao.getAnalysisOfTerm(bookId, chapterNum, term);
 	}
 
 	@Override
-	public Analysis findAnalysisByBookAndTokens(long bookId, List<String> tokens) {
-		// TODO Auto-generated method stub
-		return null;
+	public BookAnalysis findAnalysisByBookAndTerms(long bookId, Set<String> terms) {
+		AnalysisDAO dao = new AnalysisDAO();
+		return dao.findAnalysisByBookAndTerms(bookId, terms);
 	}
 
 	@Override

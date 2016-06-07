@@ -2,32 +2,37 @@ package es.unizar.tmdad.dbmodel;
 
 import java.util.List;
 
-public class Book {
+public class BookAnalysis {
 	private long id;
 	private String title;
-	private List<String> chapters;
+	private List<ChapterAnalysis> chapters;
 	
-	public Book(long id, String title, List<String> chapters) {
+	public BookAnalysis(long id, String title, List<ChapterAnalysis> chapters) {
 		this.id = id;
 		this.title = title;
-		this.chapters = chapters;
 	}
+
 	public long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+
+	public void setId(long id) {
 		this.id = id;
 	}
+
 	public String getTitle() {
 		return title;
 	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public List<String> getChapters() {
+
+	public List<ChapterAnalysis> getChapters() {
 		return chapters;
 	}
-	public void setChapters(List<String> chapters) {
+
+	public void setChapters(List<ChapterAnalysis> chapters) {
 		this.chapters = chapters;
 	}
 	
