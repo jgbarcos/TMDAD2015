@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Prototipo webgui</title>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
+    <title>Analizador de Temas</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta
             content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no"
@@ -26,8 +30,9 @@
     <!-- Moustache template for results -->
 	<script id="resultTpl" type="text/template">
 		<div class="row panel panel-default">
+			Status: {{status}}
     		<div class="panel-heading">
-				Analysis of: {{title}} ({{id}})
+				Analysis of Book: {{title}} ({{id}})
     		</div>
     		<div class="panel-body" >
 				{{#themes}}
@@ -65,14 +70,14 @@
 <nav class="navbar navbar-default" role="navigation">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-        <p class="navbar-brand">Prototipo webgui</p>
+        <p class="navbar-brand">Analizador de Temas</p>
         <p class="navbar-text">Desarrollo de Aplicaciones Distribuidas
             2015-2016</p>
     </div>
 </nav>
 <div class="container">
     <!-- Main Form -->
-    <form id="analyze" action="analyze" method="get">
+    <form id="analyze" action="users/0/analysis" method="post">
         <div class="row">
             <input type="text" class="form-control" id="bookID" name="bookID"
                    placeholder="Escribe el id del libro"/>

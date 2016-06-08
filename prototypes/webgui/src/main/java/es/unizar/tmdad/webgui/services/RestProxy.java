@@ -1,44 +1,121 @@
 package es.unizar.tmdad.webgui.services;
 
+import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import es.unizar.tmdad.model.ThemeDAO;
+
 public class RestProxy {
-	private boolean isGet;
+	private HttpMethod method;
 	private String endpoint;
 	
 	private String urlParams = "";
 	private Object requestBody = null;
 	
-	private  RestProxy(boolean isGet, String endpoint){
-		this.isGet = isGet;
+	private  RestProxy(HttpMethod method, String endpoint){
+		this.method = method;
 		this.endpoint = endpoint;
 	}
 	
 	public static RestProxy createGet(String endpoint){
-		return new RestProxy(true, endpoint);
+		return new RestProxy(HttpMethod.GET, endpoint);
 	}
 	public static RestProxy createPost(String endpoint){
-		return new RestProxy(false, endpoint);
+		return new RestProxy(HttpMethod.POST, endpoint);
+	}
+	public static RestProxy createPut(String endpoint){
+		return new RestProxy(HttpMethod.PUT, endpoint);
 	}
 	
-	public String forward(){
+	private String getURL(){
 		String url = endpoint + urlParams;
-		
-		System.out.println("FORWARDING: " + url);
 
+		System.out.println("FORWARDING: " + url);
+		
+		return url;
+	}
+	
+	public String expectsString(){
+		String url = getURL();
 		RestTemplate restTemplate = new RestTemplate();
-		if(isGet){
+		if(method.equals(HttpMethod.GET)){
 			return restTemplate.getForObject(url, String.class);
 		}
-		else{
+		else {
 			return restTemplate.postForObject(url, requestBody , String.class);
 		}
 	}
+	
+	public ResponseEntity<ThemeDAO> expectsTheme(){
+		String url = getURL();
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<ThemeDAO> entity = new HttpEntity<ThemeDAO>((ThemeDAO)requestBody, headers);
+		
+		
+		ResponseEntity<ThemeDAO> response = restTemplate.exchange(url, method, entity, ThemeDAO.class); 
+		
+		// Get response headers and content
+		headers = new HttpHeaders();
+		if(response.getHeaders() != null){
+			if(response.getHeaders().getLocation() != null){
+				URI local = URI.create(response.getHeaders().getLocation().getPath());
+				headers.setLocation(local);
+			}
+		}
+		return new ResponseEntity<ThemeDAO>(response.getBody(), headers, response.getStatusCode());
+	}
+	
+	public List<ThemeDAO> expectsThemeList(){
+		String url = getURL();
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<ThemeDAO> entity = new HttpEntity<ThemeDAO>((ThemeDAO)requestBody, headers);
+		
+		
+		ResponseEntity<ThemeDAO[]> response = restTemplate.exchange(url, method, entity, ThemeDAO[].class); 
+		
+		List<ThemeDAO> themes = Arrays.asList(response.getBody());
+		return themes;
+	}
+	
+	public ResponseEntity<String> expectsResponseEntity(){
+		String url = getURL();
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+		
+		ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class, requestBody); 
+
+		// Get response headers and content
+		headers = new HttpHeaders();
+		if(response.getHeaders() != null){
+			if(response.getHeaders().getLocation() != null){
+				URI local = URI.create(response.getHeaders().getLocation().getPath());
+				headers.setLocation(local);
+			}
+		}
+		return new ResponseEntity<String>(response.getBody(), headers, response.getStatusCode());
+	}
 		
 	public RestProxy addParam(String key, String value){
-		//key = key.replaceAll("\\[", "%5B").replaceAll("\\]", "%5D");
 		if(!value.equals("") && value != null){
 			if(urlParams.equals("")){
 				urlParams = "?";
