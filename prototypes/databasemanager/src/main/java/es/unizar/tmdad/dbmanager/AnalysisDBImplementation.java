@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import es.unizar.tmdad.dbconnecton.AnalysisDAO;
+import es.unizar.tmdad.dbconnecton.AnalysisResourceDAO;
 import es.unizar.tmdad.dbconnecton.BookDAO;
 import es.unizar.tmdad.dbconnecton.ThemeDAO;
 import es.unizar.tmdad.dbconnecton.UserDAO;
@@ -95,26 +96,26 @@ public class AnalysisDBImplementation implements AnalysisDB {
 
 	@Override
 	public long createResource(AnalysisResource resource) {
-		// TODO Auto-generated method stub
-		return 0;
+		AnalysisResourceDAO dao = new AnalysisResourceDAO();
+		return dao.createResource(resource);
 	}
 
 	@Override
 	public AnalysisResource findResourceById(long id) {
-		// TODO Auto-generated method stub
-		return null;
+		AnalysisResourceDAO dao = new AnalysisResourceDAO();
+		return dao.findResourceById(id);
 	}
 
 	@Override
 	public void updateResourceStatusById(long id, ResourceStatus status) {
-		// TODO Auto-generated method stub
-		
+		AnalysisResourceDAO dao = new AnalysisResourceDAO();
+		dao.updateResourceStatusById(id, status);
 	}
 
 	@Override
 	public ResourceStatus findResourceStatusById(long id) {
-		// TODO Auto-generated method stub
-		return null;
+		AnalysisResourceDAO dao = new AnalysisResourceDAO();
+		return dao.findResourceStatusById(id);
 	}
 	
 }
