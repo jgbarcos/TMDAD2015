@@ -1,5 +1,6 @@
 package es.unizar.tmdad.dbmodel;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class BookAnalysis {
@@ -10,6 +11,7 @@ public class BookAnalysis {
 	public BookAnalysis(long id, String title, List<ChapterAnalysis> chapters) {
 		this.id = id;
 		this.title = title;
+		this.chapters = chapters;
 	}
 
 	public long getId() {
@@ -36,4 +38,16 @@ public class BookAnalysis {
 		this.chapters = chapters;
 	}
 	
+	@Override
+	public String toString() {
+		String st = "BOOK id=" + this.id + ", title=" + this.title + ", chapters=(";
+		if (this.chapters!=null && !this.chapters.isEmpty()) {
+			for (Iterator<ChapterAnalysis> iterator = chapters.iterator(); iterator.hasNext();) {
+				ChapterAnalysis chapterAnalysis = (ChapterAnalysis) iterator.next();
+				st += chapterAnalysis + ", ";
+			}	
+		}
+		st += ")";
+		return st;
+	}
 }

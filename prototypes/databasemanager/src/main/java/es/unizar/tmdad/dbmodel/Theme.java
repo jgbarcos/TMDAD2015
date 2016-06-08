@@ -1,5 +1,6 @@
 package es.unizar.tmdad.dbmodel;
 
+import java.util.Iterator;
 import java.util.Set;
 
 public class Theme {
@@ -31,4 +32,16 @@ public class Theme {
 		this.terms = terms;
 	}
 	
+	@Override
+	public String toString() {
+		String st = "THEME id=" + this.id + ", name=" + this.name + ", terms=(";
+		if (this.terms!=null && !this.terms.isEmpty()) {
+			for (Iterator<String> iterator = terms.iterator(); iterator.hasNext();) {
+				String term = (String) iterator.next();
+				st += term + ", ";
+			}	
+		}
+		st += ")";
+		return st;
+	}
 }

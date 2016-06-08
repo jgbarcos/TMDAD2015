@@ -25,7 +25,7 @@ public class BookDAO {
 			pstmt.executeUpdate();
 			pstmt.close();
 			
-			String insertChapterSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".CHAPTER (book, num, title) VALUES (?,?,?)";
+			String insertChapterSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".CHAPTER (book, num, chapterTitle) VALUES (?,?,?)";
 			PreparedStatement pstmt2;
 			pstmt2 = conn.prepareStatement(insertChapterSQL);
 			
@@ -62,23 +62,22 @@ public class BookDAO {
 					+ "FROM " + DatabaseConstants.dbSchema + ".BOOK "
 					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".CHAPTER "
 					+ "ON " + DatabaseConstants.dbSchema + ".BOOK.id=" + DatabaseConstants.dbSchema + ".CHAPTER.book "
-					+ "WHERE " + DatabaseConstants.dbSchema + ".BOOK.id=?"
+					+ "WHERE " + DatabaseConstants.dbSchema + ".BOOK.id=? "
 					+ "ORDER BY " + DatabaseConstants.dbSchema + ".CHAPTER.num ASC";
 
 			PreparedStatement pstmt;
 			pstmt = conn.prepareStatement(selectBookSQL);
 			pstmt.setLong(1, bookId);
-			pstmt.executeUpdate();
 			
 			ResultSet rs = pstmt.executeQuery();
 
 			String chapterTitle;
 			while (rs.next()) {
 				if (book==null) {
-					String title = rs.getString(DatabaseConstants.dbSchema + ".BOOK.title");
+					String title = rs.getString("title");
 					book = new Book(bookId, title, new ArrayList<String>());
 				}
-				chapterTitle = rs.getString(DatabaseConstants.dbSchema + ".CHAPTER.title");
+				chapterTitle = rs.getString("chapterTitle");
 				book.getChapters().add(chapterTitle);
 			}				
 			pstmt.close();

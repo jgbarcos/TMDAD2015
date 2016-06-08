@@ -1,6 +1,7 @@
 package es.unizar.tmdad.dbmodel;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,4 +78,22 @@ public class AnalysisResource {
 		this.tag = tag;
 	}
 
+	@Override
+	public String toString() {
+		String st = "RESOURCE id=" + this.id + ", bookId=" + this.bookId + ", username=" + this.username + ", status=" + this.status.name() + ", tags=(";
+		if (this.tag!=null && !this.tag.isEmpty()) {
+			for (Iterator<String> iterator = tag.keySet().iterator(); iterator.hasNext();) {
+				String themeName = (String) iterator.next();
+				List<String> terms = this.tag.get(themeName);
+				st += themeName + "=[";
+				for (String term : terms) {
+					st += term + ", ";
+				}
+				st+= "], ";
+			}	
+		}
+		st += ")";
+		return st;
+	}
+	
 }

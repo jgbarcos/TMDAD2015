@@ -31,19 +31,19 @@ public class AnalysisResourceDAO {
 			pstmt.executeUpdate();
 			pstmt.close();
 			
-			String getResourceIdSQL = "SELECT id "
+			String getResourceIdSQL = "SELECT resourceId "
 					+ "FROM " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE "
-					+ "WHERE book=? AND user=? AND state=? AND ROWNUM=1"
-					+ "ORDER BY id DESC";
+					+ "WHERE book=? AND user=? AND state=? "
+					+ "ORDER BY resourceId DESC";
 			PreparedStatement pstmt2;
 			pstmt2 = conn.prepareStatement(getResourceIdSQL);
 			pstmt2.setLong(1, resource.getBookId());
 			pstmt2.setString(2, resource.getUsername());
 			pstmt2.setString(3, resource.getStatus().name());
 			
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs = pstmt2.executeQuery();
 			if (rs.next()) {
-				resourceId = rs.getLong("id");
+				resourceId = rs.getLong("resourceId");
 			}
 			
 			String insertTagSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".TAG (analysis, theme, term) VALUES (?,?,?)";
@@ -92,8 +92,8 @@ public class AnalysisResourceDAO {
 			String getResourceSQL = "SELECT * "
 					+ "FROM " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE "
 					+ "INNER JOIN " + DatabaseConstants.dbSchema + ".TAG "
-					+ "ON " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.id=" + DatabaseConstants.dbSchema + ".TAG.analysis "
-					+ "WHERE " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.id=? "
+					+ "ON " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.resourceId=" + DatabaseConstants.dbSchema + ".TAG.analysis "
+					+ "WHERE " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.resourceId=? "
 					+ "ORDER BY " + DatabaseConstants.dbSchema + ".TAG.theme";
 			PreparedStatement pstmt;
 			pstmt = conn.prepareStatement(getResourceSQL);
@@ -107,17 +107,17 @@ public class AnalysisResourceDAO {
 			String term;
 			while (rs.next()) {
 				if (resource==null) {
-					bookId = rs.getLong(DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.book");
-					username = rs.getString(DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.user");
-					status = ResourceStatus.valueOf(rs.getString(DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE.state"));
+					bookId = rs.getLong("book");
+					username = rs.getString("user");
+					status = ResourceStatus.valueOf(rs.getString("state"));
 					resource = new AnalysisResource(id, bookId, username, new HashMap<>());
 					resource.setStatus(status);
 				}
-				theme = rs.getString(DatabaseConstants.dbSchema + ".TAG.theme");
+				theme = rs.getString("theme");
 				if (!resource.getTag().containsKey(theme)) {
 					resource.getTag().put(theme, new ArrayList<>());
 				}
-				term = rs.getString(DatabaseConstants.dbSchema + ".TAG.term");
+				term = rs.getString("term");
 				resource.getTag().get(theme).add(term);
 			}
 			
@@ -144,7 +144,7 @@ public class AnalysisResourceDAO {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
-			String insertResourceSQL = "UPDATE " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE SET state=? WHERE id=?";
+			String insertResourceSQL = "UPDATE " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE SET state=? WHERE resourceId=?";
 			PreparedStatement pstmt;
 			pstmt = conn.prepareStatement(insertResourceSQL);
 			pstmt.setString(1, status.name());
@@ -175,7 +175,7 @@ public class AnalysisResourceDAO {
 			
 			String selectResourceStatusSQL = "SELECT state "
 					+ "FROM " + DatabaseConstants.dbSchema + ".ANALYSIS_RESOURCE "
-					+ "WHERE id=?";
+					+ "WHERE resourceId=?";
 			PreparedStatement pstmt;
 			pstmt = conn.prepareStatement(selectResourceStatusSQL);
 			pstmt.setLong(1, id);

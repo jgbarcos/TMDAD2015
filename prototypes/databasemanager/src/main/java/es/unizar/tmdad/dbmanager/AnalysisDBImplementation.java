@@ -1,7 +1,7 @@
 package es.unizar.tmdad.dbmanager;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.unizar.tmdad.dbconnecton.AnalysisDAO;
 import es.unizar.tmdad.dbconnecton.AnalysisResourceDAO;
@@ -89,7 +89,7 @@ public class AnalysisDBImplementation implements AnalysisDB {
 	}
 
 	@Override
-	public BookAnalysis findAnalysisByBookAndTerms(long bookId, Set<String> terms) {
+	public BookAnalysis findAnalysisByBookAndTerms(long bookId, List<String> terms) {
 		AnalysisDAO dao = new AnalysisDAO();
 		return dao.findAnalysisByBookAndTerms(bookId, terms);
 	}

@@ -36,10 +36,11 @@ public class ThemeDAO {
 			pstmt2.setString(1, theme.getName());
 			pstmt2.setString(2, username);
 			
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs = pstmt2.executeQuery();
 			if (rs.next()) {
 				themeId = rs.getLong("id");
 			}
+			pstmt2.close();
 			
 			String insertTermFromThemeSQL = "INSERT INTO " + DatabaseConstants.dbSchema + ".TERM_IN_THEME (term, theme) VALUES (?,?)";
 			PreparedStatement pstmt3;
@@ -51,11 +52,13 @@ public class ThemeDAO {
 				try {
 					term = (String) iterator.next();
 					pstmt3.setString(1, term);
-					pstmt3.setLong(2, theme.getId());
+					pstmt3.setLong(2, themeId);
+					pstmt3.executeUpdate();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
+			pstmt3.close();
 			
 			conn.close();
 		} catch (SQLException e) {
@@ -182,9 +185,9 @@ public class ThemeDAO {
 			String term;
 			Theme theme;
 			while (rs.next()) {
-				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
-				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
-				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				themeId = rs.getLong("id");
+				themeName = rs.getString("name");
+				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 					themes.put(themeId, theme);
@@ -227,8 +230,8 @@ public class ThemeDAO {
 			String themeName;
 			String term;
 			while (rs.next()) {
-				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
-				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				themeName = rs.getString("name");
+				term = rs.getString("term");
 				if (theme==null) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 				} 
@@ -271,9 +274,9 @@ public class ThemeDAO {
 			String term;
 			Theme theme;
 			while (rs.next()) {
-				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
-				themeName = rs.getString(DatabaseConstants.dbSchema + ".THEME.name");
-				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				themeId = rs.getLong("id");
+				themeName = rs.getString("name");
+				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 					themes.put(themeId, theme);
@@ -316,8 +319,8 @@ public class ThemeDAO {
 			long themeId;
 			String term;
 			while (rs.next()) {
-				themeId = rs.getLong(DatabaseConstants.dbSchema + ".THEME.id");
-				term = rs.getString(DatabaseConstants.dbSchema + ".TERM_IN_THEME.term");
+				themeId = rs.getLong("id");
+				term = rs.getString("term");
 				if (theme==null) {
 					theme = new Theme(themeId, themeName, new HashSet<String>());
 				} 

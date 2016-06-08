@@ -1,5 +1,6 @@
 package es.unizar.tmdad.dbmodel;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class ChapterAnalysis {
@@ -32,5 +33,17 @@ public class ChapterAnalysis {
 		this.counts = counts;
 	}
 	
+	@Override
+	public String toString() {
+		String st = "CHAPTER num=" + this.num + ", title=" + this.title + ", counts=[";
+		if (this.counts!=null && !this.counts.isEmpty()) {
+			for (Iterator<String> iterator = counts.keySet().iterator(); iterator.hasNext();) {
+				String term = (String) iterator.next();
+				st += term + "=" + this.counts.get(term) + ", ";
+			}	
+		}
+		st += "]";
+		return st;
+	}
 	
 }
