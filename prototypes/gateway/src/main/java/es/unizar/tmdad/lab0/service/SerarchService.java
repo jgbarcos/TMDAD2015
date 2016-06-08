@@ -9,11 +9,15 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import es.unizar.tmdad.lab0.model.PieceOfBook;
 
 public class SerarchService {
 
+	private static Map<String,String> cache = new HashMap<>();
+	
 	public static String getUrlFromId(String bookId) {
 		return "http://www.gutenberg.org/cache/epub/" + bookId + "/pg" + bookId + ".txt";
 	}
@@ -23,9 +27,11 @@ public class SerarchService {
 	}
 
 	public static ArrayList<PieceOfBook> getBook(String bookId, int piece) {
-		downloadBookFromUrl(getUrlFromId(bookId), bookId);
-		return getBook(getPathBook(bookId), bookId, piece);
-
+		if(cache == null || cache.get(bookId) == null){
+			downloadBookFromUrl(getUrlFromId(bookId), bookId);
+			cache.put(bookId, getBook(getPathBook(bookId), bookId, piece).get(0).getContent());
+		}
+		return getBookFromCache(bookId);
 	}
 
 	/**
@@ -80,5 +86,12 @@ public class SerarchService {
 			return new ArrayList<PieceOfBook> ();
 		}
 
+	}
+	
+	public static ArrayList<PieceOfBook> getBookFromCache(String bookId){
+		PieceOfBook  pieceOfBook = new PieceOfBook(bookId, cache.get(bookId), 1, 1);
+		ArrayList<PieceOfBook> lst = new ArrayList<>();
+		lst.add(pieceOfBook);
+		return lst;
 	}
 }

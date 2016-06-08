@@ -21,7 +21,7 @@ targetCompatibility = 1.8
 //version = '1.0'
 
 war {
-    baseName = 'TMDAD'
+    baseName = 'analyzer'
     version = '2016'
 }
 

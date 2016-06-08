@@ -21,7 +21,7 @@ targetCompatibility = 1.8
 //version = '1.0'
 
 war {
-    baseName = 'TMDAD'
+    baseName = 'tokenizer'
     version = '2016'
 }
 
