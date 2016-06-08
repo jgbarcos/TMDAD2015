@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import es.unizar.tmdad.analyzer.services.db.AnalysisElement;
-import es.unizar.tmdad.analyzer.services.db.UserElement;
+import es.unizar.tmdad.analyzer.services.db.model.AnalysisElement;
 import es.unizar.tmdad.analyzer.services.db.model.AnalysisResource;
 import es.unizar.tmdad.analyzer.services.db.model.Book;
 import es.unizar.tmdad.analyzer.services.db.model.BookAnalysis;
 import es.unizar.tmdad.analyzer.services.db.model.ChapterAnalysis;
 import es.unizar.tmdad.analyzer.services.db.model.ResourceStatus;
 import es.unizar.tmdad.analyzer.services.db.model.Theme;
+import es.unizar.tmdad.analyzer.services.db.model.UserElement;
 
 public class AnalysisDBMockup implements AnalysisDB {
 	private Map<String, UserElement> userData = new HashMap<String, UserElement>();

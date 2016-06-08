@@ -1,9 +1,7 @@
-package es.unizar.tmdad.analyzer.services.db;
+package es.unizar.tmdad.analyzer.services.db.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import es.unizar.tmdad.analyzer.services.db.model.Theme;
 
 public class UserElement {
 	public String username;

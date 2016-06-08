@@ -1,4 +1,4 @@
-package es.unizar.tmdad.analyzer.services.db;
+package es.unizar.tmdad.analyzer.services.db.model;
 
 public class AnalysisElement {
 	public long bookId;
