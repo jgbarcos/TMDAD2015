@@ -17,7 +17,7 @@ import es.unizar.tmdad.dbmodel.Theme;
 public class Application {
 
     public static void main(String[] args) {
-    	findResourceStatusByIdTest();
+    	createUserTest();
     }
     
     private static void createUserTest() {
