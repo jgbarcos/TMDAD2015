@@ -3,7 +3,7 @@ package es.unizar.tmdad.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
+import es.unizar.tmdad.analyzer.services.db.model.ResourceStatus;
 
 public class BookResult {
 	private long id;

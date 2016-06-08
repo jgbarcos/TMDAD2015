@@ -1,4 +1,4 @@
-package es.unizar.tmdad.analyzer.services.db;
+package es.unizar.tmdad.analyzer.services.db.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,11 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import es.unizar.tmdad.analyzer.services.db.AnalysisElement;
+import es.unizar.tmdad.analyzer.services.db.UserElement;
+import es.unizar.tmdad.analyzer.services.db.model.AnalysisResource;
+import es.unizar.tmdad.analyzer.services.db.model.Book;
+import es.unizar.tmdad.analyzer.services.db.model.BookAnalysis;
+import es.unizar.tmdad.analyzer.services.db.model.ChapterAnalysis;
+import es.unizar.tmdad.analyzer.services.db.model.ResourceStatus;
+import es.unizar.tmdad.analyzer.services.db.model.Theme;
+
 public class AnalysisDBMockup implements AnalysisDB {
 	private Map<String, UserElement> userData = new HashMap<String, UserElement>();
 	private List<AnalysisElement> analysisData = new ArrayList<AnalysisElement>();
-	private Map<Long, BookDAO> bookData = new HashMap<Long, BookDAO>();
-	private Map<Long, ResourceDAO> resourceData = new HashMap<Long, ResourceDAO>();
+	private Map<Long, Book> bookData = new HashMap<Long, Book>();
+	private Map<Long, AnalysisResource> resourceData = new HashMap<Long, AnalysisResource>();
 	
 	private long themeCount = 0;
 	private long resourceCount = 0;
@@ -23,9 +32,14 @@ public class AnalysisDBMockup implements AnalysisDB {
 	public void createUser(String username, String password) {
 		userData.put(username, new UserElement(username, password));
 	}
+	
+	@Override
+	public boolean validateUser(String username, String password) {
+		return true;
+	}
 
 	@Override
-	public Map<Long, ThemeDAO> findAllThemeByUsername(String username){
+	public Map<Long, Theme> findAllThemeByUsername(String username){
 		UserElement user = userData.get(username);
 		if(user == null){
 			return null;
@@ -35,7 +49,7 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 	
 	@Override
-	public ThemeDAO findThemeByUsernameAndId(String username, long themeId){
+	public Theme findThemeByUsernameAndThemeId(String username, long themeId){
 		UserElement user = userData.get(username);
 		if(user == null){
 			return null;
@@ -45,7 +59,7 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 	
 	@Override
-	public ThemeDAO findThemeByUsernameAndTitle(String username, String themeTitle){
+	public Theme findThemeByUsernameAndThemeName(String username, String themeName){
 		UserElement user = userData.get(username);
 		
 		if(user == null){
@@ -53,21 +67,21 @@ public class AnalysisDBMockup implements AnalysisDB {
 		}
 		
 		return user.themes.values().stream()
-				.filter(t -> t.getTitle().toLowerCase().equals(themeTitle.toLowerCase()))
+				.filter(t -> t.getName().toLowerCase().equals(themeName.toLowerCase()))
 				.findFirst().orElse(null);
 				
 	}
 	
 
 	@Override
-	public List<ThemeDAO> findThemeByUsernameLikeTitle(String username, String like) {
+	public List<Theme> findThemeByUsernameLikeThemeName(String username, String like) {
 		return userData.get(username).themes.values().stream()
-				.filter(t -> t.getTitle().toLowerCase().contains(like.toLowerCase()))
+				.filter(t -> t.getName().toLowerCase().contains(like.toLowerCase()))
 				.collect(Collectors.toList());	
 	}
 	
 	@Override
-	public long createThemeOfUser(String username, ThemeDAO theme) {
+	public long createThemeOfUser(String username, Theme theme) {
 		long id = themeCount; themeCount++;
 		
 		theme.setId(id);
@@ -77,8 +91,8 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 
 	@Override
-	public long updateThemeOfUser(String username, ThemeDAO theme) {
-		ThemeDAO resourceTheme = findThemeByUsernameAndId(username, theme.getId());
+	public long updateThemeOfUser(String username, Theme theme) {
+		Theme resourceTheme = findThemeByUsernameAndThemeId(username, theme.getId());
 		
 		if(resourceTheme == null){
 			return -1;
@@ -89,45 +103,45 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 	
 	@Override
-	public void createBook(BookDAO book){
+	public void createBook(Book book){
 		bookData.put(book.getId(), book);
 	}
 
 	@Override
-	public BookDAO findBookById(long bookId){
+	public Book findBookById(long bookId){
 		return bookData.get(bookId);
 	}
 	
 	@Override
-	public void createAnalysis(long bookId, long chapterNum, String token, long count){
-		analysisData.add(new AnalysisElement(bookId, chapterNum, token, count));
+	public void createAnalysis(long bookId, long chapterNum, String term, long count){
+		analysisData.add(new AnalysisElement(bookId, chapterNum, term, count));
 	}
 	
 	@Override
-	public long getAnalysisOfToken(long bookId, long chapterNum, String token) {
+	public long getAnalysisOfTerm(long bookId, long chapterNum, String term) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public BookAnalysisDAO findAnalysisByBookAndTokens(long bookId, List<String> tokens){
+	public BookAnalysis findAnalysisByBookAndTerms(long bookId, List<String> terms){
 		// filter by book and tokens
 		List<AnalysisElement> anElem = analysisData.stream()
-			.filter(a -> a.bookId == bookId && tokens.contains(a.token))
+			.filter(a -> a.bookId == bookId && terms.contains(a.token))
 			.collect(Collectors.toList());
 		
 		// get book and chapters info
-		BookDAO book = findBookById(bookId);
+		Book book = findBookById(bookId);
 		
 		// create analysis DAO
-		BookAnalysisDAO analysis = new BookAnalysisDAO(bookId, book.getTitle());
+		BookAnalysis analysis = new BookAnalysis(bookId, book.getTitle(), new ArrayList<>());
 		
 		// create each chapter of the analysis DAO
 		for(int i = 0; i<book.getChapters().size(); i++){
 			// Create analysis object
 			long chapterNum = i;
 			String title = book.getChapters().get(i);
-			ChapterAnalysisDAO ch = new ChapterAnalysisDAO(chapterNum, title);
+			ChapterAnalysis ch = new ChapterAnalysis(chapterNum, title, null);
 			
 			// Get chapter i analysis elements
 			List<AnalysisElement> filtered = anElem.stream()
@@ -145,7 +159,7 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 
 	@Override
-	public long createResource(ResourceDAO resource) {
+	public long createResource(AnalysisResource resource) {
 		long id = resourceCount; resourceCount++;
 		
 		resource.setId(id);		
@@ -155,7 +169,7 @@ public class AnalysisDBMockup implements AnalysisDB {
 	}
 
 	@Override
-	public ResourceDAO findResourceById(long id) {
+	public AnalysisResource findResourceById(long id) {
 		return resourceData.get(id);
 	}
 	
@@ -166,7 +180,7 @@ public class AnalysisDBMockup implements AnalysisDB {
 
 	@Override
 	public ResourceStatus findResourceStatusById(long id) {
-		ResourceDAO res = resourceData.get(id);
+		AnalysisResource res = resourceData.get(id);
 		if(res == null){
 			return ResourceStatus.NOT_FOUND;
 		}

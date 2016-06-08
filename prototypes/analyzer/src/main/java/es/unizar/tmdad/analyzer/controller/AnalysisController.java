@@ -1,9 +1,7 @@
 package es.unizar.tmdad.analyzer.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,14 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.unizar.tmdad.analyzer.service.AnalysisResourceManager;
 import es.unizar.tmdad.analyzer.services.coordinator.AnalysisCoordinator;
-import es.unizar.tmdad.analyzer.services.db.ThemeDAO;
-import es.unizar.tmdad.analyzer.services.db.AnalysisDB;
+import es.unizar.tmdad.analyzer.services.db.model.Theme;
 
 import es.unizar.tmdad.model.BookResult;
 
@@ -73,40 +69,40 @@ public class AnalysisController {
 	 * Theme Mappings
 	 */
 	@RequestMapping(value="users/{user_id}/themes/{theme_id}", method=RequestMethod.GET)
-	public ResponseEntity<ThemeDAO> getTheme(
+	public ResponseEntity<Theme> getTheme(
 			@PathVariable(value="user_id") String userId,
 			@PathVariable(value="theme_id") long themeId)
 	{		
-		ThemeDAO th = coordinator.getDb().findThemeByUsernameAndId(userId, themeId);
+		Theme th = coordinator.getDb().findThemeByUsernameAndThemeId(userId, themeId);
 		
 		if(th == null){
-			return new ResponseEntity<ThemeDAO>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Theme>(HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<ThemeDAO>(th, HttpStatus.OK);
+		return new ResponseEntity<Theme>(th, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="users/{user_id}/themes/{theme_id}", method=RequestMethod.PUT)
-	public ResponseEntity<ThemeDAO> updateTheme(
+	public ResponseEntity<Theme> updateTheme(
 			@PathVariable(value="user_id") String userId,
       		@PathVariable(value="theme_id") long themeId,
-	        @RequestBody ThemeDAO theme)
+	        @RequestBody Theme theme)
 	{
 		theme.setId(themeId);
 		long id = coordinator.getDb().updateThemeOfUser(userId, theme);
 		
 		
 		if(id != themeId){
-			return new ResponseEntity<ThemeDAO>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Theme>(HttpStatus.NOT_FOUND);
 		}
 		
-		return new ResponseEntity<ThemeDAO>(theme, HttpStatus.OK);
+		return new ResponseEntity<Theme>(theme, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="users/{user_id}/themes/", method=RequestMethod.POST)
 	public ResponseEntity<?> createTheme(
 			@PathVariable(value="user_id") String userId,
-			@RequestBody ThemeDAO theme)
+			@RequestBody Theme theme)
 	{
 		long id = coordinator.getDb().createThemeOfUser(userId, theme);
 		
@@ -127,8 +123,8 @@ public class AnalysisController {
 			@PathVariable(value="user_id") String userId,
 			@RequestParam("like") String like)
 	{
-		return coordinator.getDb().findThemeByUsernameLikeTitle(userId, like).stream()
-			.map(t -> Collections.singletonMap("value", t.getTitle()))
+		return coordinator.getDb().findThemeByUsernameLikeThemeName(userId, like).stream()
+			.map(t -> Collections.singletonMap("value", t.getName()))
 			.collect(Collectors.toList());	
 	}
 }

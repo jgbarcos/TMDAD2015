@@ -1,18 +1,16 @@
 package es.unizar.tmdad.analyzer.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.unizar.tmdad.analyzer.services.coordinator.AnalysisCoordinator;
 import es.unizar.tmdad.model.BookResult;
-import es.unizar.tmdad.analyzer.services.db.ResourceDAO;
-import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
-import es.unizar.tmdad.analyzer.services.db.ThemeDAO;
+import es.unizar.tmdad.analyzer.services.db.model.AnalysisResource;
+import es.unizar.tmdad.analyzer.services.db.model.ResourceStatus;
+import es.unizar.tmdad.analyzer.services.db.model.Theme;
 
 @Component
 public class AnalysisResourceManager {
@@ -20,14 +18,14 @@ public class AnalysisResourceManager {
 	@Autowired
 	AnalysisCoordinator coordinator;
 	
-	public long createAnalysis(String userId, long bookId, List<String> themes){	
+	public long createAnalysis(String userId, long bookId, List<String> themeNames){	
 		
-		List<ThemeDAO> themesDAO = new ArrayList<ThemeDAO>();
-		for(String th : themes){
-			themesDAO.add(coordinator.getDb().findThemeByUsernameAndTitle(userId, th));
+		List<Theme> themes = new ArrayList<Theme>();
+		for(String th : themeNames){
+			themes.add(coordinator.getDb().findThemeByUsernameAndThemeName(userId, th));
 		}
 		
-		ResourceDAO resource = new ResourceDAO(bookId, userId, themesDAO);
+		AnalysisResource resource = new AnalysisResource(bookId, userId, themes);
 		long id = coordinator.getDb().createResource(resource);
 		
 		coordinator.runAnalysis(resource);

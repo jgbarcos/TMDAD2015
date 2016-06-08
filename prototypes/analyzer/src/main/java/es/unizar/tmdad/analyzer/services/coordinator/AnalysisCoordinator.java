@@ -5,14 +5,13 @@ import es.unizar.tmdad.analyzer.interfacing.Chapter;
 import es.unizar.tmdad.analyzer.interfacing.Token;
 
 import es.unizar.tmdad.model.BookResult;
-import es.unizar.tmdad.analyzer.services.db.AnalysisDB;
-import es.unizar.tmdad.analyzer.services.db.AnalysisDBMockup;
-import es.unizar.tmdad.analyzer.services.db.BookAnalysisDAO;
-import es.unizar.tmdad.analyzer.services.db.BookDAO;
-import es.unizar.tmdad.analyzer.services.db.ChapterAnalysisDAO;
-import es.unizar.tmdad.analyzer.services.db.ResourceDAO;
-import es.unizar.tmdad.analyzer.services.db.ResourceStatus;
-
+import es.unizar.tmdad.analyzer.services.db.manager.AnalysisDB;
+import es.unizar.tmdad.analyzer.services.db.manager.AnalysisDBImplementation;
+import es.unizar.tmdad.analyzer.services.db.model.AnalysisResource;
+import es.unizar.tmdad.analyzer.services.db.model.Book;
+import es.unizar.tmdad.analyzer.services.db.model.BookAnalysis;
+import es.unizar.tmdad.analyzer.services.db.model.ChapterAnalysis;
+import es.unizar.tmdad.analyzer.services.db.model.ResourceStatus;
 import es.unizar.tmdad.analyzer.messaging.GatewayRPCClient;
 import es.unizar.tmdad.analyzer.messaging.TokenizerRPCClient;
 
@@ -40,7 +39,7 @@ public class AnalysisCoordinator {
 	private AnalysisDB db;
 	
 	public AnalysisCoordinator(){
-		db = new AnalysisDBMockup();
+		db = new AnalysisDBImplementation();
 	}
 	
 	public AnalysisDB getDb(){
@@ -48,7 +47,7 @@ public class AnalysisCoordinator {
 	}
 	
 	@Async
-	public void runAnalysis(ResourceDAO resource){
+	public void runAnalysis(AnalysisResource resource){
 		
 		//Get tokens
 		List<String> tokens = resource.getTag().values().stream()
@@ -71,7 +70,7 @@ public class AnalysisCoordinator {
 			chapterNames.add(ch.getTitle());
 		}
 		
-		BookDAO book = new BookDAO(resource.getBookId(), tokenized.getTitle(), chapterNames);
+		Book book = new Book(resource.getBookId(), tokenized.getTitle(), chapterNames);
 		getDb().createBook(book);	
 		
 		// TODO: this should be done by the tokenizer whenever a new token count is obtained
@@ -88,7 +87,7 @@ public class AnalysisCoordinator {
 	}
 	
 	public BookResult recoverResult(long resourceId) {
-		ResourceDAO resource = getDb().findResourceById(resourceId);
+		AnalysisResource resource = getDb().findResourceById(resourceId);
 		
 		//Get tokens
 		List<String> tokens = resource.getTag().values().stream()
@@ -96,14 +95,14 @@ public class AnalysisCoordinator {
 			.distinct()
 			.collect(Collectors.toList());
 		
-		BookAnalysisDAO analysis = getDb().findAnalysisByBookAndTokens(resource.getBookId(), tokens);
+		BookAnalysis analysis = getDb().findAnalysisByBookAndTerms(resource.getBookId(), tokens);
 		
 		BookResult result = new BookResult(analysis.getId(), analysis.getTitle());
-		for(ChapterAnalysisDAO ch : analysis.getChapters()){				
+		for(ChapterAnalysis ch : analysis.getChapters()){				
 			for(String theme : resource.getTag().keySet()){
 				for(String token : resource.getTag().get(theme)){
 					long count = ch.getCounts().getOrDefault(token, 0L);
-					result.addToken(theme, (int)ch.getNumChapter(), ch.getTitle(), token, count);
+					result.addToken(theme, (int)ch.getNum(), ch.getTitle(), token, count);
 					
 				}
 			}

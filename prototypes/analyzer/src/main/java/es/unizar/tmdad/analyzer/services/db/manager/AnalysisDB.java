@@ -1,4 +1,4 @@
-package es.unizar.tmdad.analyzer.services.db;
+package es.unizar.tmdad.analyzer.services.db.manager;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ public interface AnalysisDB {
 	 * Theme Data
 	 */
 	public Map<Long, Theme> findAllThemeByUsername(String username);
-	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName);
+	public List<Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName);
 	
 	public Theme findThemeByUsernameAndThemeId(String username, long themeId);
 	public Theme findThemeByUsernameAndThemeName(String username, String themeName);
