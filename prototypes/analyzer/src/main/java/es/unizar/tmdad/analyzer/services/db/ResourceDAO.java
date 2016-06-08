@@ -30,10 +30,12 @@ public class ResourceDAO {
 		this.tag = new HashMap<String, List<String>>();
 		
 		for(ThemeDAO th : themes){
-			List<String> tokens = th.getTokens().stream()
-					.map(String::toLowerCase)
-					.collect(Collectors.toList());
-			tag.put(th.getTitle(), tokens);
+			if(th != null){
+				List<String> tokens = th.getTokens().stream()
+						.map(String::toLowerCase)
+						.collect(Collectors.toList());
+				tag.put(th.getTitle(), tokens);
+			}
 		}
 	}
 

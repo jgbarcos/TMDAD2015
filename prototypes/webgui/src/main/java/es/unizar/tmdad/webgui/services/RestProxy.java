@@ -1,5 +1,6 @@
 package es.unizar.tmdad.webgui.services;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,7 +70,8 @@ public class RestProxy {
 		headers = new HttpHeaders();
 		if(response.getHeaders() != null){
 			if(response.getHeaders().getLocation() != null){
-				headers.setLocation(response.getHeaders().getLocation());
+				URI local = URI.create(response.getHeaders().getLocation().getPath());
+				headers.setLocation(local);
 			}
 		}
 		return new ResponseEntity<ThemeDAO>(response.getBody(), headers, response.getStatusCode());
@@ -91,13 +93,26 @@ public class RestProxy {
 		return themes;
 	}
 	
-	public ResponseEntity<?> expectsResponseEntity(){
+	public ResponseEntity<String> expectsResponseEntity(){
 		String url = getURL();
-
+		
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<?> response = restTemplate.exchange(url, method, null, String.class, requestBody); 
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+		
+		ResponseEntity<String> response = restTemplate.exchange(url, method, entity, String.class, requestBody); 
 
-		return response;
+		// Get response headers and content
+		headers = new HttpHeaders();
+		if(response.getHeaders() != null){
+			if(response.getHeaders().getLocation() != null){
+				URI local = URI.create(response.getHeaders().getLocation().getPath());
+				headers.setLocation(local);
+			}
+		}
+		return new ResponseEntity<String>(response.getBody(), headers, response.getStatusCode());
 	}
 		
 	public RestProxy addParam(String key, String value){
