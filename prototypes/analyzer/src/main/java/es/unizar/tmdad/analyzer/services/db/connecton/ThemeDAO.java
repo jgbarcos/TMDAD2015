@@ -7,11 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.unizar.tmdad.analyzer.services.db.model.Theme;
 
@@ -48,7 +46,7 @@ public class ThemeDAO {
 			PreparedStatement pstmt3;
 			pstmt3 = conn.prepareStatement(insertTermFromThemeSQL);
 			
-			Set<String> terms = theme.getTerms();
+			List<String> terms = theme.getTerms();
 			String term;
 			for (Iterator<String> iterator = terms.iterator(); iterator.hasNext();) {
 				try {
@@ -191,7 +189,7 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 					themes.put(themeId, theme);
 				} else {
 					theme = themes.get(themeId);
@@ -235,7 +233,7 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (theme==null) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 				} 
 				theme.getTerms().add(term);
 			}
@@ -281,7 +279,7 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 					themes.put(themeId, theme);
 				} else {
 					theme = themes.get(themeId);
@@ -331,7 +329,7 @@ public class ThemeDAO {
 				themeId = rs.getLong("id");
 				term = rs.getString("term");
 				if (theme==null) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 				} 
 				theme.getTerms().add(term);
 			}

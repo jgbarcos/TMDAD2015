@@ -67,7 +67,7 @@ function registerThemeInput(){
 	})
 	.autocomplete({
 		source: function( request, response ) {
-			jQuery.getJSON("users/0/themes/", {
+			jQuery.getJSON("users/user/themes/", {
 				like: extractLast( request.term )
 			}, function (data) {
 	            response($.map(data, function (theme) {

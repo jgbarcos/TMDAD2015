@@ -17,12 +17,12 @@ import es.unizar.tmdad.dbmodel.Theme;
 public class Application {
 
     public static void main(String[] args) {
-    	createUserTest();
+    	createThemeOfUserTest();
     }
     
     private static void createUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	analyzer.createUser("user", "password");
+    	analyzer.createUser("0", "password");
     	System.out.print("createUserTest FINISHED");
     }
     
@@ -86,7 +86,7 @@ public class Application {
     	terms.add("empire");
     	terms.add("castle");
     	Theme theme = new Theme(-1, "war", terms);
-    	long themeId = analyzer.createThemeOfUser("user", theme);
+    	long themeId = analyzer.createThemeOfUser("0", theme);
     	System.out.println("themeId=" + themeId);
     	System.out.print("createThemeOfUserTest FINISHED");
     }

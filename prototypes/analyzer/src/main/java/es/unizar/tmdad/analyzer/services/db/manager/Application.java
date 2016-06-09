@@ -2,11 +2,9 @@ package es.unizar.tmdad.analyzer.services.db.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.unizar.tmdad.analyzer.services.db.model.AnalysisResource;
 import es.unizar.tmdad.analyzer.services.db.model.Book;
@@ -71,7 +69,7 @@ public class Application {
     
     private static void createThemeOfUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	Set<String> terms = new HashSet<String>();
+    	List<String> terms = new ArrayList<String>();
     	/*terms.add("animal");
     	terms.add("plant");
     	terms.add("flower");
@@ -91,7 +89,7 @@ public class Application {
     
     private static void updateThemeOfUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	Set<String> terms = new HashSet<>();
+    	List<String> terms = new ArrayList<>();
     	terms.add("sword");
     	terms.add("war");
     	terms.add("king");

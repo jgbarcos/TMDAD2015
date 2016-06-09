@@ -1,14 +1,17 @@
 package es.unizar.tmdad.model;
 
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 public class Theme {
 	private long id;
 	private String name;
-	private Set<String> terms;
+	private List<String> terms;
 	
-	public Theme(long id, String name, Set<String> terms) {
+	public Theme() {
+		
+	}
+	public Theme(long id, String name, List<String> terms) {
 		this.id = id;
 		this.name = name;
 		this.terms = terms;
@@ -25,10 +28,10 @@ public class Theme {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Set<String> getTerms() {
+	public List<String> getTerms() {
 		return terms;
 	}
-	public void setTerms(Set<String> terms) {
+	public void setTerms(List<String> terms) {
 		this.terms = terms;
 	}
 	

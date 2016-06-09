@@ -1,7 +1,6 @@
 package es.unizar.tmdad.analyzer.services.db.manager;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 import es.unizar.tmdad.analyzer.services.db.model.Theme;
 
@@ -11,7 +10,7 @@ public class PredefinedData {
 	private static String MOCKUP_PASSWROD = "unsafe_password";
 	
 	private static void createTheme(AnalysisDB db, String title, String... tokenNames){
-		Theme theme = new Theme(-1, title, new HashSet<>(Arrays.asList(tokenNames)));
+		Theme theme = new Theme(-1, title, Arrays.asList(tokenNames));
 		db.createThemeOfUser(MOCKUP_USERNAME, theme);
 	}
 	
