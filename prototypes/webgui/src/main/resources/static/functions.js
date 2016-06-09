@@ -9,17 +9,50 @@ function split( val ) {
 function extractLast( term ) {
 	return split( term ).pop();
 }
+function arrayToString( arr, n){
+	var sliced = arr.slice(0, n);
+	if(sliced.length != arr.length){
+		return String(sliced)+ "...";
+	}
+	else{
+		return String(sliced);
+	}
+}
 
 function registerSearch() {
 	$("#analyze").submit(function(ev){
 		event.preventDefault();
 		// Split themeInput and clear empty fields like "", " "... etc
 		var themeList = split($("#themeInput").val()).filter(function(val){return val.trim()!=""});
-		$.get($(this).attr('action'), {book: $("#bookID").val(), themes: themeList}, function(data) {
+		
+		$.ajax({
+		   type: 'POST',
+		   url: $(this).attr('action'),
+		   data: {book: $("#bookID").val(), themes: themeList}, 
+		   success: function(res,status,XHR) { 
+			   var location = XHR.getResponseHeader('Location');	
+			   getAnalysis(location);
+		   }
+		});
+	});
+}
+
+// This function gets called until status equals to "FINISHED"
+function getAnalysis(location) {
+	$.ajax({
+		type: "GET",
+		url: location,
+		success: function(data) {
+			var parsedData = JSON.parse(data);
+			
 			var template = $('#resultTpl').html();
-			var rendered = Mustache.to_html(template, JSON.parse(data))
+			var rendered = Mustache.to_html(template, parsedData)
 			$("#resultsBlock").empty().append(rendered);
-		});	
+			
+			if(parsedData.status != "FINISHED"){
+				setTimeout(getAnalysis, 1000, location);
+			}
+		}
 	});
 }
 
@@ -34,9 +67,16 @@ function registerThemeInput(){
 	})
 	.autocomplete({
 		source: function( request, response ) {
-			jQuery.getJSON("themes/", {
+			jQuery.getJSON("users/0/themes/", {
 				like: extractLast( request.term )
-			}, response );
+			}, function (data) {
+	            response($.map(data, function (theme) {
+	                return {
+	                    label: theme.title + "(" + theme.id + "): " + arrayToString(theme.tokens,5),
+	                    value: theme.title
+	                };
+	            })); 
+			});
 		},
 		search: function() {
 			// custom minLength

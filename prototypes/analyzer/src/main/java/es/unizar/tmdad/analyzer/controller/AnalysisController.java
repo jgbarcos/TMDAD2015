@@ -1,9 +1,7 @@
 package es.unizar.tmdad.analyzer.controller;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import es.unizar.tmdad.analyzer.service.AnalysisResourceManager;
 import es.unizar.tmdad.analyzer.services.coordinator.AnalysisCoordinator;
 import es.unizar.tmdad.analyzer.services.db.model.Theme;
-
 import es.unizar.tmdad.model.BookResult;
 
 
@@ -99,7 +96,7 @@ public class AnalysisController {
 		return new ResponseEntity<Theme>(theme, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="users/{user_id}/themes/", method=RequestMethod.POST)
+	@RequestMapping(value="users/{user_id}/themes", method=RequestMethod.POST)
 	public ResponseEntity<?> createTheme(
 			@PathVariable(value="user_id") String userId,
 			@RequestBody Theme theme)
@@ -118,13 +115,15 @@ public class AnalysisController {
 	}
 	
 	
-	@RequestMapping(value="users/{user_id}/themes/", method={RequestMethod.GET}, params={"like"})
-	public List<Map<String, String>> getThemesLike(
+	@RequestMapping(value="users/{user_id}/themes", method={RequestMethod.GET}, params={"like"})
+	public ResponseEntity<List<Theme>> getThemesLike(
 			@PathVariable(value="user_id") String userId,
 			@RequestParam("like") String like)
 	{
-		return coordinator.getDb().findThemeByUsernameLikeThemeName(userId, like).stream()
-			.map(t -> Collections.singletonMap("value", t.getName()))
+		List<Theme> mapping = coordinator.getDb().findThemeByUsernameLikeThemeName(userId, like).stream()
 			.collect(Collectors.toList());	
+		
+		final ResponseEntity<List<Theme>> entity = new ResponseEntity<List<Theme>>(mapping, HttpStatus.OK);
+		return entity;
 	}
 }
