@@ -1,12 +1,11 @@
 package es.unizar.tmdad.dbmanager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
@@ -17,12 +16,95 @@ import es.unizar.tmdad.dbmodel.Theme;
 public class Application {
 
     public static void main(String[] args) {
-    	createThemeOfUserTest();
+    	fillDatabase();
+    }
+    
+    private static void fillDatabase() {
+    	AnalysisDB analyzer = new AnalysisDBImplementation();
+    	analyzer.createUser("user", "password");
+    	
+    	String[] termsArray = new String[]{"Queen", "King", "gryphon","mad","creature","creatures","heaven","Dwarfish","Elfin","Fey","Runes","Sorcerous","Thews","Wizardly","Gods","Magic"};	
+    	List<String> terms = Arrays.asList(termsArray);
+    	Theme theme = new Theme(-1, "Fantasy", terms);
+    	long themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"mock","dance","joke","laugh"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Comedy", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"cat","turtle","rabbit","pig","fish","pigs","cats","whale","whales","leviathan","dog","cow","bull","horse"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Animals", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"curious","silence","afraid","curiosity","secret","Evidentiary","Improbable","Counterintelligence","Directives","Encryption","Megatonnage","Protocol"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Mistery", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"soldiers","gun","pistol","fire","murder","help","live","death","executed","captain","dead","blood","sword","knife","battle","skull"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Action", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"sea","beach","tree","mushroom","ship","boat","boats","air","sun","water","sky","snow","mountain","lake","river"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Nature", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"cook","kitchen","boil","bread"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Cook", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"children","kid","game","play","school","toy","plushie","doll","ball"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Kids", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"love","sex","friend","couple","boyfriend","girlfriend","hug","heart","soul","wife","husband","Fingertips","Gasp","Gaze","Heartbeats","Loins","Sigh","Throb","Yearn"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Love", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"ghost","dark","darkness","fear","enchanted","Elder","Eldritch","Hideous","Ichor","Intone","Old Ones","Soulless","Squamous","Sublimed","Tenebrous","afraid"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Horror", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"Baronial","Breeches","Centurion","Codpiece","Curricle","Donjon","Egad","Garderobe","Hallowed","Majestic","Manservant","Reticule","Salver","Sirrah","Snuffbox","Varlet"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Historical", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"Actinic","Anomaly","Ansible","Continuum","Vortex","Enhanced","FTL","Wormhole","Nanites","Neutronium","Noosphere","Sentient","Singularity","Subspace","Terraform"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Science Fiction", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
+    	
+    	termsArray = new String[]{"Corral","Desperado","Gunslinger","Rugged","Sagebrush","Saloon","Solitary","Wrangler"};	
+    	terms = Arrays.asList(termsArray);
+    	theme = new Theme(-1, "Western", terms);
+    	themeId = analyzer.createThemeOfUser("user", theme);
+    	theme.setId(themeId);
     }
     
     private static void createUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	analyzer.createUser("0", "password");
+    	analyzer.createUser("user", "password");
     	System.out.print("createUserTest FINISHED");
     }
     
@@ -37,10 +119,9 @@ public class Application {
     
     private static void findThemeByUsernameLikeThemeNameTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	Map<Long,Theme> themes = analyzer.findThemeByUsernameLikeThemeName("user", "na");
-    	for (Iterator<Long> iterator = themes.keySet().iterator(); iterator.hasNext();) {
-    		Long themeId = (Long) iterator.next();
-			Theme theme = themes.get(themeId);
+    	List<Theme> themes = analyzer.findThemeByUsernameLikeThemeName("user", "na");
+    	for (Iterator<Theme> iterator = themes.iterator(); iterator.hasNext();) {
+			Theme theme = iterator.next();
 			System.out.println(theme);
 		}
     	System.out.print("findThemeByUsernameLikeThemeNameTest FINISHED");
@@ -73,7 +154,7 @@ public class Application {
     
     private static void createThemeOfUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	Set<String> terms = new HashSet<String>();
+    	List<String> terms = new ArrayList<String>();
     	/*terms.add("animal");
     	terms.add("plant");
     	terms.add("flower");
@@ -93,7 +174,7 @@ public class Application {
     
     private static void updateThemeOfUserTest() {
     	AnalysisDB analyzer = new AnalysisDBImplementation();
-    	Set<String> terms = new HashSet<>();
+    	List<String> terms = new ArrayList<>();
     	terms.add("sword");
     	terms.add("war");
     	terms.add("king");

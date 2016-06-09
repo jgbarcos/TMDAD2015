@@ -5,11 +5,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import es.unizar.tmdad.dbmodel.Theme;
 
@@ -46,7 +46,7 @@ public class ThemeDAO {
 			PreparedStatement pstmt3;
 			pstmt3 = conn.prepareStatement(insertTermFromThemeSQL);
 			
-			Set<String> terms = theme.getTerms();
+			List<String> terms = theme.getTerms();
 			String term;
 			for (Iterator<String> iterator = terms.iterator(); iterator.hasNext();) {
 				try {
@@ -189,7 +189,7 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 					themes.put(themeId, theme);
 				} else {
 					theme = themes.get(themeId);
@@ -233,7 +233,7 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (theme==null) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 				} 
 				theme.getTerms().add(term);
 			}
@@ -250,10 +250,11 @@ public class ThemeDAO {
 
 	}
 
-	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
+	public List<Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
 		Connection conn = null;
 		PreparedStatement pstmt;
 		Map<Long, Theme> themes = new HashMap<>();
+		List<Theme> themeList = new ArrayList<>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DatabaseConstants.dbUrl, DatabaseConstants.dbUser, DatabaseConstants.dbPass);
@@ -278,13 +279,19 @@ public class ThemeDAO {
 				themeName = rs.getString("name");
 				term = rs.getString("term");
 				if (!themes.containsKey(themeId)) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 					themes.put(themeId, theme);
 				} else {
 					theme = themes.get(themeId);
 				}
 				theme.getTerms().add(term);
 			}
+			
+			for (Iterator<Long> iterator = themes.keySet().iterator(); iterator.hasNext();) {
+				Long thId = (Long) iterator.next();
+				themeList.add(themes.get(thId));
+			}
+
 			pstmt.close();
 			conn.close();
 			
@@ -294,7 +301,7 @@ public class ThemeDAO {
 			e.printStackTrace();
 		} 
 		
-		return themes;
+		return themeList;
 	}
 
 	public Theme findThemeByUsernameAndThemeName(String username, String themeName) {
@@ -322,7 +329,7 @@ public class ThemeDAO {
 				themeId = rs.getLong("id");
 				term = rs.getString("term");
 				if (theme==null) {
-					theme = new Theme(themeId, themeName, new HashSet<String>());
+					theme = new Theme(themeId, themeName, new ArrayList<>());
 				} 
 				theme.getTerms().add(term);
 			}

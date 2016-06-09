@@ -125,11 +125,11 @@ public class AnalysisDAO {
 				chapterTitle = rs.getString("chapterTitle");
 				term = rs.getString("term");
 				count = rs.getLong("termCount");
-				if (bookAnalysis.getChapters().size()<chapterNum) {
+				if (bookAnalysis.getChapters().size()<=chapterNum) {
 					chapter = new ChapterAnalysis(chapterNum, chapterTitle, new HashMap<String, Long>());
 					bookAnalysis.getChapters().add(chapter);
 				} else {
-					chapter = bookAnalysis.getChapters().get(chapterNum-1);	
+					chapter = bookAnalysis.getChapters().get(chapterNum);	
 				} 
 				chapter.getCounts().put(term, count);
 			}				

@@ -8,9 +8,9 @@ import es.unizar.tmdad.dbconnecton.AnalysisResourceDAO;
 import es.unizar.tmdad.dbconnecton.BookDAO;
 import es.unizar.tmdad.dbconnecton.ThemeDAO;
 import es.unizar.tmdad.dbconnecton.UserDAO;
-import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
+import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.ResourceStatus;
 import es.unizar.tmdad.dbmodel.Theme;
 
@@ -35,7 +35,7 @@ public class AnalysisDBImplementation implements AnalysisDB {
 	}
 
 	@Override
-	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
+	public List<Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName) {
 		ThemeDAO dao = new ThemeDAO();
 		return dao.findThemeByUsernameLikeThemeName(username, likeThemeName);
 	}

@@ -3,9 +3,9 @@ package es.unizar.tmdad.dbmanager;
 import java.util.List;
 import java.util.Map;
 
-import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.AnalysisResource;
 import es.unizar.tmdad.dbmodel.Book;
+import es.unizar.tmdad.dbmodel.BookAnalysis;
 import es.unizar.tmdad.dbmodel.ResourceStatus;
 import es.unizar.tmdad.dbmodel.Theme;
 
@@ -21,7 +21,7 @@ public interface AnalysisDB {
 	 * Theme Data
 	 */
 	public Map<Long, Theme> findAllThemeByUsername(String username);
-	public Map<Long, Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName);
+	public List<Theme> findThemeByUsernameLikeThemeName(String username, String likeThemeName);
 	
 	public Theme findThemeByUsernameAndThemeId(String username, long themeId);
 	public Theme findThemeByUsernameAndThemeName(String username, String themeName);
