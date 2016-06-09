@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("mysql:mysql-connector-java:5.1.16")
+        classpath 'mysql:mysql-connector-java:5.1.16'
     }
 }
 
