@@ -31,24 +31,22 @@ public class BookDAO {
 			
 			for (int i = 0; i < book.getChapters().size(); i++) {
 				pstmt2.setLong(1, book.getId());
-				pstmt2.setInt(2, i+1);
+				pstmt2.setInt(2, i);
 				pstmt2.setString(3, book.getChapters().get(i));
 				pstmt2.executeUpdate();
 			}	
 			pstmt2.close();
 			
 			conn.close();		
-		} catch (SQLException e) {
-			e.printStackTrace();			
+		} catch (Exception e) {
+			//e.printStackTrace();			
 			if (conn!=null) {
 				try {
 					conn.close();
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					//e1.printStackTrace();
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		}
 	}
 

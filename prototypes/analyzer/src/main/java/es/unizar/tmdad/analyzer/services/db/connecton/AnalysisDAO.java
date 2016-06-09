@@ -29,18 +29,16 @@ public class AnalysisDAO {
 			pstmt.executeUpdate();
 			pstmt.close();
 			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();			
+		} catch (Exception e) {
+			//e.printStackTrace();			
 			if (conn!=null) {
 				try {
 					conn.close();
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					//e1.printStackTrace();
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	public long getAnalysisOfTerm(long bookId, long chapterNum, String term) {

@@ -68,7 +68,7 @@ public class AnalysisResourceDAO {
 			pstmt3.close();
 			
 			conn.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();			
 			if (conn!=null) {
 				try {
@@ -77,8 +77,6 @@ public class AnalysisResourceDAO {
 					e1.printStackTrace();
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		}
 		return resourceId;
 	}
