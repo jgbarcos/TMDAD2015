@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="_csrf" content="${_csrf.term}"/>
+    <meta name="_csrf" content="${_csrf.token}"/>
     <!-- default header name is X-CSRF-TOKEN -->
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
@@ -49,7 +49,7 @@
 		{{#chapters}}
 		<div class="row panel panel-default">
     		<div class="panel-heading">
-				Chapter {{num}}: {{title}}
+				Chapter {{id}}: {{title}}
     		</div>
     		<div class="panel-body" >
 				{{#themes}}

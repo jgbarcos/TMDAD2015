@@ -27,6 +27,7 @@ public class AnalysisResourceManager {
 		
 		AnalysisResource resource = new AnalysisResource(bookId, userId, themes);
 		long id = coordinator.getDb().createResource(resource);
+		resource.setId(id);
 		
 		coordinator.runAnalysis(resource);
 		

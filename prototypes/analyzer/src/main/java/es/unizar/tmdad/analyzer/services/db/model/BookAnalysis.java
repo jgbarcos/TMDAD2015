@@ -8,6 +8,10 @@ public class BookAnalysis {
 	private String title;
 	private List<ChapterAnalysis> chapters;
 	
+	public BookAnalysis() {
+		
+	}
+	
 	public BookAnalysis(long id, String title, List<ChapterAnalysis> chapters) {
 		this.id = id;
 		this.title = title;
