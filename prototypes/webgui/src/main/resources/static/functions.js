@@ -72,8 +72,8 @@ function registerThemeInput(){
 			}, function (data) {
 	            response($.map(data, function (theme) {
 	                return {
-	                    label: theme.title + "(" + theme.id + "): " + arrayToString(theme.tokens,5),
-	                    value: theme.title
+	                    label: theme.name + "(" + theme.id + "): " + arrayToString(theme.terms,5),
+	                    value: theme.name
 	                };
 	            })); 
 			});
