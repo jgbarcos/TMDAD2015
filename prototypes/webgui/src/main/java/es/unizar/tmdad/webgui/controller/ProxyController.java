@@ -17,7 +17,7 @@ import es.unizar.tmdad.webgui.services.RestProxy;
 @RestController
 public class ProxyController {
 	
-	String url = "http://localhost:8081/";
+	String url = "http://52.37.164.135:8080/";
 	
 	
 	@RequestMapping(value="users/{user_id}/analysis", method=RequestMethod.POST)
